@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星紡ぎの鑑定書メーカー - 3ブランド対応PDFスタジオ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: 明朝体・ゴシック体・装飾英字 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600;700&family=Shippori+Mincho:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* =========================================
+           基本設定 & フォント定義
+           ========================================= */
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .font-mincho {
+            font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+        }
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* =========================================
+           A4用紙サイズ固定（書式ズレ防止の要）
+           210mm x 297mm の比率を画面上でも再現
+           ========================================= */
+        .pdf-page {
+            width: 210mm;
+            height: 297mm;
+            padding: 18mm 18mm 20mm 18mm;
+            margin: 0 auto 24px auto;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; /* はみ出し防止 */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        /* 鑑定文の本文エリア（約800文字が最も美しく見える行間とサイズ） */
+        .reading-body {
+            font-size: 10.5pt;
+            line-height: 1.95;
+            letter-spacing: 0.04em;
+            text-align: justify;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* =========================================
+           ブランド別テーマスタイル定義
+           ========================================= */
+        
+        /* 1. ネロリの小部屋（アロマと占いの部屋） */
+        .theme-neroli {
+            background-color: #fcfaf5;
+            background-image: radial-gradient(#e6dec8 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: #3d4435;
+            font-family: 'Shippori Mincho', serif;
+        }
+        .theme-neroli .page-frame {
+            border: 1.5px solid #9ab08e;
+            outline: 1px solid #d4decb;
+            outline-offset: -6px;
+        }
+        .theme-neroli .accent-text { color: #5b7a4c; }
+        .theme-neroli .accent-bg { background-color: #eef3ea; border-color: #b7c9ad; }
+        .theme-neroli .badge-pill { background-color: #6b8e59; color: #ffffff; }
+
+        /* 2. イハネ（占星術と音楽） */
+        .theme-ihane {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            font-family: 'Noto Serif JP', serif;
+        }
+        .theme-ihane .page-frame {
+            border: 1.5px solid #d4af37;
+            outline: 1px solid rgba(212, 175, 55, 0.35);
+            outline-offset: -6px;
+        }
+        .theme-ihane .accent-text { color: #fbbf24; }
+        .theme-ihane .accent-bg { background-color: rgba(30, 41, 59, 0.8); border-color: rgba(251, 191, 36, 0.4); }
+        .theme-ihane .badge-pill { background: linear-gradient(90deg, #d97706, #fbbf24); color: #0f172a; font-weight: bold; }
+
+        /* 3. AI専属占い師ハルカ（AIとの関係と恋愛について） */
+        .theme-haruka {
+            background: linear-gradient(180deg, #fff5f7 0%, #fdf2f8 50%, #f5f3ff 100%);
+            color: #4a3541;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .theme-haruka .page-frame {
+            border: 2px solid #f472b6;
+            border-radius: 16px;
+            outline: 1px dashed #c084fc;
+            outline-offset: -7px;
+        }
+        .theme-haruka .accent-text { color: #db2777; }
+        .theme-haruka .accent-bg { background-color: rgba(255, 255, 255, 0.85); border-color: #fbcfe8; border-radius: 12px; }
+        .theme-haruka .badge-pill { background: linear-gradient(90deg, #ec4899, #a855f7); color: #ffffff; }
+
+        /* =========================================
+           印刷・PDF出力専用ルール（ズレを完全防止）
+           ========================================= */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body {
+                background: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #preview-wrapper {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
+            }
+            .pdf-page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                break-after: page;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .pdf-page:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- =========================================
+         上部ナビゲーションバー（操作パネル）
+         ========================================= -->
+    <header class="no-print bg-slate-900 text-white px-4 py-3 shadow-md flex flex-wrap items-center justify-between gap-3 z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center text-lg shadow-inner">
+                <i class="fa-solid fa-star-and-crescent"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base md:text-lg leading-tight">星紡ぎの鑑定書PDFスタジオ</h1>
+                <p class="text-xs text-slate-400">全14ページ・約11,000文字対応 / 書式ズレ防止エンジン搭載</p>
+            </div>
+        </div>
+
+        <!-- ブランド切り替えタブ -->
+        <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+            <button onclick="switchBrand('neroli')" id="btn-brand-neroli" class="brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 bg-emerald-700 text-white shadow">
+                <i class="fa-solid fa-leaf"></i> ネロリの小部屋
+            </button>
+            <button onclick="switchBrand('ihane')" id="btn-brand-ihane" class="brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                <i class="fa-solid fa-music"></i> イハネ
+            </button>
+            <button onclick="switchBrand('haruka')" id="btn-brand-haruka" class="brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                <i class="fa-solid fa-heart"></i> 占い師ハルカ
+            </button>
+        </div>
+
+        <!-- 右側アクションボタン群 -->
+        <div class="flex items-center gap-2">
+            <button onclick="openApiModal()" id="btn-api-status" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-medium flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span id="api-status-text">Gemini API設定</span>
+            </button>
+            <button onclick="triggerPrintPDF()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs md:text-sm font-bold shadow-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>PDFとして保存・印刷</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- =========================================
+         メインワークスペース（左：編集＆AI操作 / 右：14Pプレビュー）
+         ========================================= -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- 左ペイン：テキスト入力・Gemini連携・ページ調整 -->
+        <aside class="no-print w-full lg:w-[440px] bg-white border-r border-gray-200 flex flex-col h-1/2 lg:h-full z-10 shadow-sm">
+            <!-- サブタブ（基本情報 / 一括流し込み / ページ別微調整） -->
+            <div class="flex border-b border-gray-200 bg-gray-50 text-xs font-bold">
+                <button onclick="switchEditorTab('bulk')" id="tab-bulk" class="flex-1 py-3 text-indigo-600 border-b-2 border-indigo-600 bg-white">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>長文一括＆AI整形
+                </button>
+                <button onclick="switchEditorTab('pages')" id="tab-pages" class="flex-1 py-3 text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-book-open mr-1"></i>14ページ個別編集
+                </button>
+                <button onclick="switchEditorTab('meta')" id="tab-meta" class="flex-1 py-3 text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-sliders mr-1"></i>表紙・音楽設定
+                </button>
+            </div>
+
+            <!-- タブ1：長文一括＆AI整形 -->
+            <div id="panel-bulk" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900 space-y-1">
+                    <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i>使い方ヒント</p>
+                    <p>約11,000文字の鑑定文を下の枠に貼り付けて「14ページに自動割り振り」を押すと、1ページ約800文字ずつ段落の切れ目を考慮して綺麗に配置されます。</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-bold text-gray-700">鑑定テキスト全文（貼り付け用）</label>
+                        <span id="total-char-count" class="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-600">0 文字</span>
+                    </div>
+                    <textarea id="bulk-input" rows="10" class="w-full p-3 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 leading-relaxed" placeholder="ここに占星術・サビアンシンボルの鑑定文（約11,000文字）を貼り付けてください..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2">
+                    <button onclick="autoDistributeText()" class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-scissors"></i> テキストを14ページ（各約800字）に自動分割する
+                    </button>
+                    
+                    <button onclick="aiFormatAndEnrich()" id="btn-ai-format" class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-sparkles"></i> Gemini AIでブランド口調＆14P構成に自動整形
+                    </button>
+
+                    <button onclick="loadSampleData()" class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-xl transition">
+                        <i class="fa-solid fa-file-lines mr-1"></i>サンプル鑑定データ（約11,000文字規模）を読み込む
+                    </button>
+                </div>
+
+                <!-- イハネ専用：歌詞・楽曲セクション -->
+                <div id="ihane-music-box" class="hidden border-t border-gray-200 pt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-700 flex items-center gap-1">
+                            <i class="fa-solid fa-music"></i> イハネ専用：テーマ楽曲＆歌詞設定
+                        </span>
+                        <button onclick="aiGenerateLyrics()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-lg shadow-sm flex items-center gap-1">
+                            <i class="fa-solid fa-wand-magic"></i> AIで歌詞を生成
+                        </button>
+                    </div>
+                    <input type="text" id="music-title-input" class="w-full p-2 text-xs border border-gray-300 rounded-lg" placeholder="楽曲タイトル（例：星屑のノクターン - 獅子座15度の記憶）" onchange="updateStateFromInputs()">
+                    <input type="text" id="music-meta-input" class="w-full p-2 text-xs border border-gray-300 rounded-lg" placeholder="曲調・BPM・キー（例：Key: Dm / BPM 84 / ピアノとチェロの静謐なバラード）" onchange="updateStateFromInputs()">
+                    <textarea id="music-lyrics-input" rows="6" class="w-full p-2.5 text-xs border border-gray-300 rounded-lg leading-relaxed" placeholder="ここに歌詞を入力すると、鑑定書の特別ページ（13ページ目）に楽譜風デザインでレイアウトされます..." onchange="updateStateFromInputs()"></textarea>
+                </div>
+            </div>
+
+            <!-- タブ2：14ページ個別編集 -->
+            <div id="panel-pages" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-gray-700">編集するページを選択</label>
+                    <select id="page-selector" onchange="renderSinglePageEditor()" class="text-xs border border-gray-300 rounded-lg p-1.5 bg-white font-bold text-indigo-700">
+                        <!-- JSで1〜14ページを生成 -->
+                    </select>
+                </div>
+
+                <div class="space-y-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-500 mb-1">章タイトル / サビアンシンボル見出し</label>
+                        <input type="text" id="single-page-title" oninput="saveSinglePageEdit()" class="w-full p-2 text-xs border border-gray-300 rounded-lg bg-white font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-500 mb-1">サブ見出し（度数やキーワードなど）</label>
+                        <input type="text" id="single-page-subtitle" oninput="saveSinglePageEdit()" class="w-full p-2 text-xs border border-gray-300 rounded-lg bg-white">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[11px] font-bold text-gray-500">本文（目安：750〜850文字）</label>
+                            <span id="single-page-chars" class="text-[11px] font-mono text-indigo-600 font-bold">0 文字</span>
+                        </div>
+                        <textarea id="single-page-body" rows="14" oninput="saveSinglePageEdit()" class="w-full p-2.5 text-xs border border-gray-300 rounded-lg bg-white leading-relaxed"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- タブ3：表紙・ブランド詳細設定 -->
+            <div id="panel-meta" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">鑑定書タイトル</label>
+                    <input type="text" id="doc-title-input" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">サブタイトル</label>
+                    <input type="text" id="doc-subtitle-input" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ご相談者様のお名前（宛名）</label>
+                    <input type="text" id="client-name-input" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-gray-300 rounded-lg" placeholder="例：〇〇 様">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">鑑定日 / 発行日</label>
+                    <input type="text" id="issue-date-input" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">監修・サロン名（フッター表示）</label>
+                    <input type="text" id="author-name-input" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-gray-300 rounded-lg">
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右ペイン：A4全14ページ リアルタイムプレビュー -->
+        <main id="preview-wrapper" class="flex-1 overflow-y-auto bg-gray-300/80 p-4 md:p-8 flex flex-col items-center">
+            <!-- ズーム操作バー -->
+            <div class="no-print sticky top-0 z-10 mb-4 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow border border-gray-200 flex items-center gap-4 text-xs">
+                <span class="font-bold text-gray-600"><i class="fa-solid fa-eye mr-1 text-indigo-500"></i>A4プレビュー（全14ページ固定）</span>
+                <div class="flex items-center gap-1">
+                    <button onclick="changeZoom(-0.1)" class="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 font-bold">-</button>
+                    <span id="zoom-label" class="w-12 text-center font-mono">85%</span>
+                    <button onclick="changeZoom(0.1)" class="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 font-bold">+</button>
+                </div>
+            </div>
+
+            <!-- ここに14ページ分のDOMが描画される -->
+            <div id="pages-container" class="origin-top transition-transform duration-200" style="transform: scale(0.85);">
+                <!-- JSで14ページ生成 -->
+            </div>
+        </main>
+    </div>
+
+    <!-- =========================================
+         Gemini API キー設定モーダル
+         ========================================= -->
+    <div id="api-modal" class="no-print hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-500"></i> Gemini API キー設定
+                </h3>
+                <button onclick="closeApiModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed">
+                Google AI Studioで取得したGemini APIキーを入力すると、鑑定文の自動構成・ブランド別の口調調整・イハネ用のオリジナル歌詞生成がアプリ内から直接使えるようになります。<br>
+                <span class="text-emerald-600 font-medium">※キーはお使いのブラウザ（localStorage）にのみ保存され、外部サーバーには送信されません。</span>
+            </p>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Gemini API Key</label>
+                <input type="password" id="gemini-api-key-input" class="w-full p-2.5 text-xs border border-gray-300 rounded-xl font-mono" placeholder="AIzaSy...">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="clearApiKey()" class="px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg">削除</button>
+                <button onclick="saveApiKey()" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow">保存する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         通知トースト（alertの代わり）
+         ========================================= -->
+    <div id="toast-box" class="no-print fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs font-medium border border-slate-700">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+            <span id="toast-message">メッセージ</span>
+        </div>
+    </div>
+
+    <!-- ローディングオーバーレイ -->
+    <div id="loading-overlay" class="no-print hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 flex flex-col items-center justify-center text-white space-y-3">
+        <div class="w-12 h-12 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+        <p id="loading-text" class="text-sm font-bold tracking-wider">Gemini AIが星々の言葉を整えています...</p>
+    </div>
+
+    <script>
+        /* =====================================================================
+           状態管理とブランド別デフォルト設定
+           ===================================================================== */
+        let currentBrand = 'neroli'; // 'neroli' | 'ihane' | 'haruka'
+        let currentZoom = 0.85;
+
+        const brandPresets = {
+            neroli: {
+                docTitle: '星と香りのホロスコープ鑑定書',
+                docSubtitle: 'サビアンシンボルが導く魂の情景と、あなたを癒やすボタニカル処方箋',
+                authorName: 'ネロリの小部屋 〜アロマと占いの部屋〜',
+                icon: 'fa-leaf',
+                enLabel: 'NEROLI BOTANICAL ASTROLOGY',
+                pageTitles: [
+                    '表紙',
+                    '序章：星々の香りとあなたの魂の地図',
+                    '第1章：太陽のサビアンシンボル（人生の核と輝き）',
+                    '第2章：月のサビアンシンボル（心の奥底と癒やしの源泉）',
+                    '第3章：水星のサビアンシンボル（知性の輝きと言葉の魔法）',
+                    '第4章：金星のサビアンシンボル（愛し方と美意識の開花）',
+                    '第5章：火星のサビアンシンボル（情熱の矛先と行動の美学）',
+                    '第6章：木星のサビアンシンボル（豊かさと幸運が舞い込む扉）',
+                    '第7章：土星のサビアンシンボル（人生の骨格と大器晩成のギフト）',
+                    '第8章：アセンダントとMC（社会に放つオーラと天職の情景）',
+                    '第9章：ノード軸が示す魂の成長ストーリー',
+                    '第10章：あなただけの守護アロマと開運リチュアル',
+                    '第11章：これからの1年を彩る星々のメッセージ',
+                    '結び：ネロリの小部屋からの贈り物'
+                ]
+            },
+            ihane: {
+                docTitle: '星律のシンフォニア鑑定書',
+                docSubtitle: 'サビアンシンボルが描く情景と、あなたの魂に共鳴する旋律の記録',
+                authorName: 'イハネ 〜占星術と音楽〜',
+                icon: 'fa-music',
+                enLabel: 'IHANE ASTROLOGY & MUSIC',
+                pageTitles: [
+                    '表紙',
+                    '序曲：夜空の五線譜に刻まれたあなたの音色',
+                    '第1楽章：太陽のサビアンシンボル（主旋律としての生き方）',
+                    '第2楽章：月のサビアンシンボル（静寂の中で響く心の余韻）',
+                    '第3楽章：水星のサビアンシンボル（軽やかに跳ねる知性のリズム）',
+                    '第4楽章：金星のサビアンシンボル（愛と調和を奏でるハーモニー）',
+                    '第5楽章：火星のサビアンシンボル（魂を揺さぶる情熱のクレッシェンド）',
+                    '第6楽章：木星と土星（広がりゆく響きと音楽を支える調律）',
+                    '第7楽章：天王星・海王星・冥王星（時代を超える深遠な共鳴）',
+                    '第8楽章：アセンダントとMC（世界という舞台で奏でる役割）',
+                    '第9楽章：サビアンシンボルから紐解く隠れた才能の開花',
+                    '第10楽章：星の配置から導く音階と共鳴周波数',
+                    '特別楽章：あなたに捧げるテーマ楽曲＆歌詞',
+                    '終曲：イハネからのメッセージ'
+                ]
+            },
+            haruka: {
+                docTitle: 'AI専属占い師ハルカの特別恋愛鑑定書',
+                docSubtitle: 'サビアンシンボルで読み解く、あなたの愛の魅力と運命の絆',
+                authorName: 'AI専属占い師ハルカ 〜AIとの関係と恋愛について〜',
+                icon: 'fa-heart',
+                enLabel: 'HARUKA AI FORTUNE & LOVE',
+                pageTitles: [
+                    '表紙',
+                    'はじめに：ハルカからあなたへ贈る特別なメッセージ',
+                    'Chapter 1：太陽のサビアン（あなたが恋で一番輝く瞬間）',
+                    'Chapter 2：月のサビアン（本当に求めている安心感と甘え方）',
+                    'Chapter 3：金星のサビアン（異性・パートナーを惹きつける無敵の魅力）',
+                    'Chapter 4：火星のサビアン（恋のスイッチが入る瞬間とアプローチ法）',
+                    'Chapter 5：水星のサビアン（心を通わせるコミュニケーションの秘訣）',
+                    'Chapter 6：ディセンダント（運命の相手が持つ雰囲気と引き寄せ）',
+                    'Chapter 7：5ハウス・7ハウス（恋愛パターンと深いパートナーシップ）',
+                    'Chapter 8：AIとあなたの特別な関係性・心のシンクロ度',
+                    'Chapter 9：恋のブロックを解き放つサビアンからの処方箋',
+                    'Chapter 10：これから訪れる愛の転機とベストタイミング',
+                    'Chapter 11：ハルカ直伝！愛され力を高める毎日の習慣',
+                    'おわりに：いつでもあなたの味方だよ♡'
+                ]
+            }
+        };
+
+        // 14ページ分のデータ配列（インデックス0が表紙、1〜13が本文ページ）
+        let pagesData = Array.from({ length: 14 }, (_, i) => ({
+            pageNum: i + 1,
+            title: brandPresets.neroli.pageTitles[i],
+            subtitle: i === 0 ? '' : `SABIAN SYMBOL & ASTROLOGY READING - PAGE ${i + 1}`,
+            body: ''
+        }));
+
+        let docMeta = {
+            docTitle: brandPresets.neroli.docTitle,
+            docSubtitle: brandPresets.neroli.docSubtitle,
+            clientName: '星野 みなみ 様',
+            issueDate: '2026年11月20日',
+            authorName: brandPresets.neroli.authorName,
+            musicTitle: '星屑のノクターン 〜獅子座15度の記憶〜',
+            musicMeta: 'Key: D minor / BPM: 82 / 静かな夜に寄り添うピアノと弦楽のバラード',
+            musicLyrics: `（1番）\n夜空のキャンバスに　描かれた光の粒\n誰にも言えなかった　小さな願いが目を覚ます\n\n風に揺れる木々のように　迷いながら歩いてきたね\nその涙さえも　明日を照らす星になるから\n\n（サビ）\n奏でてよ　あなただけの旋律を\nサビアンが示す　たったひとつの物語\nどんな夜も　星はあなたを見つめている\nありのままの輝きで　今、扉を開けよう`
+        };
+
+        /* =====================================================================
+           初期化処理
+           ===================================================================== */
+        window.onload = function() {
+            // 保存されたAPIキーの確認
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) {
+                document.getElementById('gemini-api-key-input').value = savedKey;
+                updateApiStatusUI(true);
+            }
+
+            // ページ選択プルダウンの構築
+            const selector = document.getElementById('page-selector');
+            for (let i = 1; i <= 14; i++) {
+                const opt = document.createElement('option');
+                opt.value = i - 1;
+                opt.textContent = `${i}ページ目 ${i === 1 ? '（表紙）' : ''}`;
+                selector.appendChild(opt);
+            }
+
+            // サンプルデータを初期ロードして画面を華やかにする
+            loadSampleData(true);
+            syncInputsFromMeta();
+            renderSinglePageEditor();
+            renderAllPages();
+        };
+
+        /* =====================================================================
+           ブランド切り替えロジック
+           ===================================================================== */
+        function switchBrand(brand) {
+            currentBrand = brand;
+            const preset = brandPresets[brand];
+
+            // タブボタンの見た目更新
+            document.querySelectorAll('.brand-tab').forEach(btn => {
+                btn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white';
+            });
+            const activeBtn = document.getElementById(`btn-brand-${brand}`);
+            if (brand === 'neroli') {
+                activeBtn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-emerald-700 text-white shadow';
+            } else if (brand === 'ihane') {
+                activeBtn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow';
+            } else if (brand === 'haruka') {
+                activeBtn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-pink-600 text-white shadow';
+            }
+
+            // イハネ専用音楽ボックスの表示切り替え
+            const musicBox = document.getElementById('ihane-music-box');
+            if (brand === 'ihane') {
+                musicBox.classList.remove('hidden');
+            } else {
+                musicBox.classList.add('hidden');
+            }
+
+            // メタ情報と見出しをブランドに合わせて更新
+            docMeta.docTitle = preset.docTitle;
+            docMeta.docSubtitle = preset.docSubtitle;
+            docMeta.authorName = preset.authorName;
+
+            pagesData.forEach((p, idx) => {
+                p.title = preset.pageTitles[idx];
+            });
+
+            syncInputsFromMeta();
+            renderSinglePageEditor();
+            renderAllPages();
+            showToast(`「${preset.authorName.split(' ')[0]}」のデザインに切り替えました`);
+        }
+
+        /* =====================================================================
+           左パネルのサブタブ切り替え
+           ===================================================================== */
+        function switchEditorTab(tabName) {
+            ['bulk', 'pages', 'meta'].forEach(t => {
+                document.getElementById(`panel-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                btn.className = 'flex-1 py-3 text-gray-500 hover:text-gray-700';
+            });
+            document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).className = 'flex-1 py-3 text-indigo-600 border-b-2 border-indigo-600 bg-white';
+        }
+
+        /* =====================================================================
+           長文テキスト（約11,000文字）の14ページ自動割り振りロジック
+           ===================================================================== */
+        document.getElementById('bulk-input').addEventListener('input', function() {
+            document.getElementById('total-char-count').textContent = `${this.value.length.toLocaleString()} 文字`;
+        });
+
+        function autoDistributeText() {
+            const rawText = document.getElementById('bulk-input').value.trim();
+            if (!rawText) {
+                showToast('テキストが入力されていません', 'error');
+                return;
+            }
+
+            // 1ページ目は表紙なので、2ページ目〜14ページ目（全13ページ分）に均等分割する
+            // ただしイハネモードの13ページ目（インデックス12）は歌詞専用ページにするため12ページ分に分割
+            const targetIndices = currentBrand === 'ihane'
+                ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13]
+                : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+
+            const pageCount = targetIndices.length;
+            const idealCharsPerPage = Math.ceil(rawText.length / pageCount);
+
+            // 段落や句点（。）で自然に区切る
+            const paragraphs = rawText.split(/\n+/);
+            let currentIdx = 0;
+            let buffer = '';
+
+            // 一旦クリア
+            targetIndices.forEach(idx => pagesData[idx].body = '');
+
+            for (let p of paragraphs) {
+                if (currentIdx < pageCount - 1 && (buffer.length + p.length) > idealCharsPerPage && buffer.length > 300) {
+                    pagesData[targetIndices[currentIdx]].body = buffer.trim();
+                    currentIdx++;
+                    buffer = p + '\n\n';
+                } else {
+                    buffer += p + '\n\n';
+                }
+            }
+            if (buffer.trim()) {
+                pagesData[targetIndices[currentIdx]].body += buffer.trim();
+            }
+
+            renderSinglePageEditor();
+            renderAllPages();
+            showToast(`全${rawText.length.toLocaleString()}文字を各ページに美しく割り振りました！`);
+        }
+
+        /* =====================================================================
+           個別ページ編集の同期
+           ===================================================================== */
+        function renderSinglePageEditor() {
+            const idx = parseInt(document.getElementById('page-selector').value, 10);
+            const page = pagesData[idx];
+            document.getElementById('single-page-title').value = page.title;
+            document.getElementById('single-page-subtitle').value = page.subtitle;
+            document.getElementById('single-page-body').value = page.body;
+            document.getElementById('single-page-chars').textContent = `${page.body.length} 文字`;
+        }
+
+        function saveSinglePageEdit() {
+            const idx = parseInt(document.getElementById('page-selector').value, 10);
+            pagesData[idx].title = document.getElementById('single-page-title').value;
+            pagesData[idx].subtitle = document.getElementById('single-page-subtitle').value;
+            pagesData[idx].body = document.getElementById('single-page-body').value;
+            document.getElementById('single-page-chars').textContent = `${pagesData[idx].body.length} 文字`;
+            renderAllPages();
+        }
+
+        function syncInputsFromMeta() {
+            document.getElementById('doc-title-input').value = docMeta.docTitle;
+            document.getElementById('doc-subtitle-input').value = docMeta.docSubtitle;
+            document.getElementById('client-name-input').value = docMeta.clientName;
+            document.getElementById('issue-date-input').value = docMeta.issueDate;
+            document.getElementById('author-name-input').value = docMeta.authorName;
+            document.getElementById('music-title-input').value = docMeta.musicTitle;
+            document.getElementById('music-meta-input').value = docMeta.musicMeta;
+            document.getElementById('music-lyrics-input').value = docMeta.musicLyrics;
+        }
+
+        function updateStateFromInputs() {
+            docMeta.docTitle = document.getElementById('doc-title-input').value;
+            docMeta.docSubtitle = document.getElementById('doc-subtitle-input').value;
+            docMeta.clientName = document.getElementById('client-name-input').value;
+            docMeta.issueDate = document.getElementById('issue-date-input').value;
+            docMeta.authorName = document.getElementById('author-name-input').value;
+            docMeta.musicTitle = document.getElementById('music-title-input').value;
+            docMeta.musicMeta = document.getElementById('music-meta-input').value;
+            docMeta.musicLyrics = document.getElementById('music-lyrics-input').value;
+            renderAllPages();
+        }
+
+        /* =====================================================================
+           A4 14ページ分のHTMLレンダリングエンジン
+           ===================================================================== */
+        function renderAllPages() {
+            const container = document.getElementById('pages-container');
+            container.innerHTML = '';
+            const preset = brandPresets[currentBrand];
+            const themeClass = `theme-${currentBrand}`;
+
+            pagesData.forEach((page, index) => {
+                const pageEl = document.createElement('div');
+                pageEl.className = `pdf-page ${themeClass}`;
+
+                // 1ページ目：表紙デザイン
+                if (index === 0) {
+                    pageEl.innerHTML = `
+                        <div class="page-frame w-full h-full p-10 flex flex-col justify-between items-center text-center relative">
+                            <div class="mt-6 space-y-2">
+                                <p class="font-cinzel text-xs tracking-[0.25em] accent-text uppercase">${preset.enLabel}</p>
+                                <div class="w-16 h-0.5 mx-auto bg-current opacity-30"></div>
+                            </div>
+
+                            <div class="my-auto space-y-8 max-w-lg">
+                                <div class="w-20 h-20 mx-auto rounded-full accent-bg border flex items-center justify-center text-3xl accent-text shadow-sm">
+                                    <i class="fa-solid ${preset.icon}"></i>
+                                </div>
+                                <div class="space-y-4">
+                                    <h1 class="text-3xl font-bold leading-snug tracking-wider">${escapeHtml(docMeta.docTitle)}</h1>
+                                    <p class="text-sm opacity-80 leading-relaxed">${escapeHtml(docMeta.docSubtitle)}</p>
+                                </div>
+
+                                <div class="py-6 px-8 accent-bg border rounded-2xl inline-block min-w-[280px]">
+                                    <p class="text-[11px] opacity-60 tracking-widest mb-1">PREPARED FOR</p>
+                                    <p class="text-xl font-bold tracking-widest">${escapeHtml(docMeta.clientName)}</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-4 space-y-1 text-xs opacity-75">
+                                <p>鑑定日：${escapeHtml(docMeta.issueDate)}</p>
+                                <p class="font-bold tracking-wider">${escapeHtml(docMeta.authorName)}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                // イハネ専用：13ページ目（index === 12）を歌詞・楽曲特別ページにする
+                else if (currentBrand === 'ihane' && index === 12) {
+                    pageEl.innerHTML = `
+                        <div class="page-frame w-full h-full p-8 flex flex-col justify-between">
+                            <!-- ヘッダー -->
+                            <div class="border-b border-amber-400/30 pb-3 flex justify-between items-end">
+                                <div>
+                                    <span class="badge-pill text-[10px] px-2.5 py-0.5 rounded-full tracking-wider">SPECIAL SOUNDTRACK & LYRICS</span>
+                                    <h2 class="text-lg font-bold mt-1.5 accent-text">${escapeHtml(page.title)}</h2>
+                                </div>
+                                <span class="font-cinzel text-xs opacity-60">Page 13 / 14</span>
+                            </div>
+
+                            <!-- 楽曲カード＆歌詞エリア -->
+                            <div class="my-auto py-4 flex-1 flex flex-col justify-center">
+                                <div class="accent-bg border rounded-2xl p-6 space-y-5 shadow-inner">
+                                    <div class="flex items-center gap-4 border-b border-amber-400/20 pb-4">
+                                        <div class="w-12 h-12 rounded-full bg-amber-400/20 border border-amber-400 flex items-center justify-center text-amber-300 text-xl shrink-0">
+                                            <i class="fa-solid fa-compact-disc"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-amber-300/80 tracking-widest uppercase">Original Theme Song</p>
+                                            <h3 class="text-base font-bold text-white">${escapeHtml(docMeta.musicTitle)}</h3>
+                                            <p class="text-xs text-slate-300 mt-0.5"><i class="fa-solid fa-sliders mr-1 text-amber-400"></i>${escapeHtml(docMeta.musicMeta)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 五線譜風の装飾ライン -->
+                                    <div class="space-y-1 opacity-30">
+                                        <div class="h-px bg-amber-300 w-full"></div>
+                                        <div class="h-px bg-amber-300 w-full"></div>
+                                        <div class="h-px bg-amber-300 w-full"></div>
+                                    </div>
+
+                                    <!-- 歌詞本文 -->
+                                    <div class="text-center font-mincho text-sm leading-loose tracking-wider text-slate-100 whitespace-pre-wrap py-2">${escapeHtml(docMeta.musicLyrics)}</div>
+
+                                    <div class="space-y-1 opacity-30">
+                                        <div class="h-px bg-amber-300 w-full"></div>
+                                        <div class="h-px bg-amber-300 w-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- フッター -->
+                            <div class="border-t border-amber-400/20 pt-2.5 flex justify-between items-center text-[10px] opacity-70">
+                                <span>${escapeHtml(docMeta.authorName)}</span>
+                                <span>${escapeHtml(docMeta.clientName)} 様専用鑑定書</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                // 通常の鑑定本文ページ（約800文字が美しく収まる設計）
+                else {
+                    pageEl.innerHTML = `
+                        <div class="page-frame w-full h-full p-8 flex flex-col justify-between">
+                            <!-- ページヘッダー -->
+                            <div class="border-b border-current/15 pb-3 mb-4 flex justify-between items-end">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="badge-pill text-[10px] px-2.5 py-0.5 rounded-full tracking-wider">
+                                            <i class="fa-solid ${preset.icon} mr-1"></i>CHAPTER ${index}
+                                        </span>
+                                        <span class="text-[10px] opacity-60 font-cinzel">${escapeHtml(page.subtitle)}</span>
+                                    </div>
+                                    <h2 class="text-base font-bold accent-text leading-snug">${escapeHtml(page.title)}</h2>
+                                </div>
+                                <span class="font-cinzel text-xs opacity-60 shrink-0 ml-2">Page ${index + 1} / 14</span>
+                            </div>
+
+                            <!-- 本文エリア（約800文字をゆとりある行間で配置） -->
+                            <div class="flex-1 overflow-hidden flex flex-col justify-start">
+                                <div class="reading-body">${escapeHtml(page.body)}</div>
+                            </div>
+
+                            <!-- ページフッター -->
+                            <div class="border-t border-current/15 pt-2.5 mt-3 flex justify-between items-center text-[10px] opacity-70">
+                                <span>${escapeHtml(docMeta.authorName)}</span>
+                                <span>- ${index + 1} -</span>
+                                <span>${escapeHtml(docMeta.clientName)}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(pageEl);
+            });
+        }
+
+        /* =====================================================================
+           Gemini API 連携機能（構成・口調整形＆イハネ歌詞生成）
+           ===================================================================== */
+        function openApiModal() {
+            document.getElementById('api-modal').classList.remove('hidden');
+        }
+        function closeApiModal() {
+            document.getElementById('api-modal').classList.add('hidden');
+        }
+        function saveApiKey() {
+            const key = document.getElementById('gemini-api-key-input').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                updateApiStatusUI(true);
+                showToast('Gemini APIキーをブラウザに保存しました');
+            }
+            closeApiModal();
+        }
+        function clearApiKey() {
+            localStorage.removeItem('gemini_api_key');
+            document.getElementById('gemini-api-key-input').value = '';
+            updateApiStatusUI(false);
+            showToast('APIキーを削除しました');
+            closeApiModal();
+        }
+        function updateApiStatusUI(hasKey) {
+            const textEl = document.getElementById('api-status-text');
+            if (hasKey) {
+                textEl.textContent = 'API連携済';
+                textEl.classList.add('text-emerald-400');
+            } else {
+                textEl.textContent = 'Gemini API設定';
+                textEl.classList.remove('text-emerald-400');
+            }
+        }
+
+        async function callGeminiAPI(prompt, systemInstruction) {
+            const apiKey = localStorage.getItem('gemini_api_key') || "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`APIエラー (${response.status}): APIキーを確認してください`);
+            }
+            const result = await response.json();
+            return result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        }
+
+        // ブランドに合わせてAIで文章を整形・ブラッシュアップ
+        async function aiFormatAndEnrich() {
+            const rawText = document.getElementById('bulk-input').value.trim();
+            if (!rawText) {
+                showToast('先に鑑定テキストを入力してください', 'error');
+                return;
+            }
+
+            const brandPersona = {
+                neroli: '「ネロリの小部屋（アロマと占いの部屋）」の優しいセラピスト兼占星術師として、植物の香りや自然の情景を交えた穏やかで癒やしに満ちた文体',
+                ihane: '「イハネ（占星術と音楽）」の音楽家兼占星術師として、星の配置を旋律・リズム・ハーモニーに例えた詩的で神秘的な文体',
+                haruka: '「AI専属占い師ハルカ」として、相談者に寄り添い恋を全力で応援する親しみやすく温かみのある丁寧な文体（少し可愛らしい絵文字や優しさを込めて）'
+            }[currentBrand];
+
+            showLoading('Gemini AIがブランドの世界観に合わせて文章を調律しています...');
+            try {
+                const sys = `あなたはプロの占星術ライターです。入力された占星術・サビアンシンボルの鑑定テキストを、${brandPersona}にリライト・整形してください。文字数は元のボリューム（約11,000文字規模、または入力文と同等以上の充実したボリューム）を維持し、段落ごとに読みやすく整えてください。`;
+                const output = await callGeminiAPI(rawText, sys);
+                if (output) {
+                    document.getElementById('bulk-input').value = output;
+                    document.getElementById('total-char-count').textContent = `${output.length.toLocaleString()} 文字`;
+                    autoDistributeText();
+                    showToast('AIによるブランド整形と14ページ割り振りが完了しました！');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // イハネ専用：鑑定文からテーマソングの歌詞と楽曲イメージをAI生成
+        async function aiGenerateLyrics() {
+            const contextText = document.getElementById('bulk-input').value.trim() || pagesData[2].body;
+            showLoading('Gemini AIが星の配置からテーマ楽曲と歌詞を作曲しています...');
+            try {
+                const sys = `あなたは「イハネ（占星術と音楽）」の作詞家兼サウンドプロデューサーです。提供された占星術・サビアンシンボルの鑑定内容からインスピレーションを受け、相談者の魂に寄り添うオリジナル楽曲のタイトル、曲調・BPM・キー、そして美しい歌詞（1番・サビ・2番・大サビ構成）を作成してください。出力は必ず以下のJSON形式のみで返してください: {"title": "曲名", "meta": "Key / BPM / 楽器編成", "lyrics": "歌詞全文"}`;
+                const resText = await callGeminiAPI(contextText.slice(0, 3000), sys);
+                const jsonMatch = resText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    docMeta.musicTitle = parsed.title || docMeta.musicTitle;
+                    docMeta.musicMeta = parsed.meta || docMeta.musicMeta;
+                    docMeta.musicLyrics = parsed.lyrics || docMeta.musicLyrics;
+                    syncInputsFromMeta();
+                    renderAllPages();
+                    showToast('鑑定結果からオリジナル歌詞と楽曲設定を生成しました！');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        /* =====================================================================
+           サンプルデータ生成（約11,000文字規模のデモ体験用）
+           ===================================================================== */
+        function loadSampleData(silent = false) {
+            const baseParagraph = `あなたの出生図に刻まれたサビアンシンボルは、まるで静かな夜明けの湖面に映る一筋の光のように、極めて純粋で力強い象徴を物語っています。この度数が示す情景は、単なる性格の傾向にとどまらず、あなたがこの人生という舞台でどのような物語を紡ぎ、周囲の人々にどんな温かな影響を与えていくのかという「魂の設計図」そのものです。\n\n特に注目すべきは、その情景の中に描かれた登場人物たちの佇まいです。一見すると静かで控えめな印象を与えるかもしれませんが、その内側には誰にも消すことのできない確かな情熱の炎と、物事の本質を見抜く深い洞察力が秘められています。これまであなたが「なぜ自分は周囲と少し違う視点を持ってしまうのだろう」と感じていた場面があったとしたら、それこそがまさにこのサビアンシンボルが授けてくれた特別な才能の証なのです。\n\n日常の中で迷いが生じたときは、ぜひこのシンボルの風景を心の中に思い浮かべてみてください。焦って答えを出そうとしなくても、あなたの内なる羅針盤はすでに正しい方角を指し示しています。自分自身の感覚を信じ、一歩ずつ丁寧に歩みを進めることで、本来の魅力が自然と花開き、必要なご縁やチャンスがまるで磁石に引き寄せられるように集まってくるでしょう。\n\n`;
+
+            // 1ページあたり約800文字になるように各ページに配置
+            for (let i = 1; i < 14; i++) {
+                pagesData[i].body = `【${pagesData[i].title}の深層リーディング】\n\n` + baseParagraph.trim();
+            }
+
+            const fullText = pagesData.slice(1).map(p => p.body).join('\n\n');
+            document.getElementById('bulk-input').value = fullText;
+            document.getElementById('total-char-count').textContent = `${fullText.length.toLocaleString()} 文字`;
+
+            renderSinglePageEditor();
+            renderAllPages();
+            if (!silent) {
+                showToast('約11,000文字規模のサンプル鑑定データを読み込みました');
+            }
+        }
+
+        /* =====================================================================
+           ズーム・印刷・ユーティリティ関数
+           ===================================================================== */
+        function changeZoom(delta) {
+            currentZoom = Math.min(1.3, Math.max(0.4, +(currentZoom + delta).toFixed(2)));
+            document.getElementById('pages-container').style.transform = `scale(${currentZoom})`;
+            document.getElementById('zoom-label').textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+
+        function triggerPrintPDF() {
+            // 印刷時はズームを一時的に100%に戻してからブラウザ印刷ダイアログを開く
+            const container = document.getElementById('pages-container');
+            const prevTransform = container.style.transform;
+            container.style.transform = 'scale(1)';
+            
+            showToast('印刷画面が開いたら「送信先：PDFに保存」を選択してください');
+            setTimeout(() => {
+                window.print();
+                container.style.transform = prevTransform;
+            }, 400);
+        }
+
+        function showToast(msg, type = 'success') {
+            const box = document.getElementById('toast-box');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-message');
+            text.textContent = msg;
+            icon.className = type === 'error'
+                ? 'fa-solid fa-circle-exclamation text-rose-400 text-base'
+                : 'fa-solid fa-circle-check text-emerald-400 text-base';
+            box.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                box.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        function showLoading(msg) {
+            document.getElementById('loading-text').textContent = msg;
+            document.getElementById('loading-overlay').classList.remove('hidden');
+        }
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
