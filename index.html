@@ -3,34 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canva連携・3ブランド鑑定書＆タロットAIスタジオ</title>
+    <title>占い鑑定書＆タロットAIスタジオ（PDF＆Canva両対応）</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: 明朝体・ゴシック体・手書き風欧文フォント -->
+    <!-- Google Fonts: 明朝体・ゴシック体・欧文装飾フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
         /* 基本フォント設定 */
         body {
             font-family: 'Noto Sans JP', sans-serif;
             background-color: #f1f5f9;
-            color: #1e293b;
         }
         .font-mincho {
             font-family: 'Shippori Mincho', serif;
         }
-        .font-cinzel {
-            font-family: 'Cinzel', 'Shippori Mincho', serif;
+        .font-maru {
+            font-family: 'Zen Maru Gothic', sans-serif;
         }
-        .font-cormorant {
-            font-family: 'Cormorant Garamond', 'Shippori Mincho', serif;
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
         }
 
         /* =====================================================================
-           A4用紙固定レイアウト（Canva貼り付けイメージ＆プレビュー用）
+           A4用紙固定レイアウト（Canva貼り付けイメージ＆PDF印刷出力用）
            ===================================================================== */
         .pdf-page {
             width: 210mm;
@@ -45,14 +45,67 @@
             flex-direction: column;
         }
 
-        /* 鑑定文の本文エリア（約950〜1,050文字がA4下端まで最も美しく収まるサイズと行間） */
+        /* 鑑定文の本文エリア（約800〜1,100文字がA4下端まで美しく収まるサイズと行間） */
         .reading-body {
-            font-size: 11.2pt;
-            line-height: 2.05;
-            letter-spacing: 0.05em;
+            font-size: 10.6pt;
+            line-height: 1.92;
+            letter-spacing: 0.04em;
             text-align: justify;
             white-space: pre-wrap;
             word-break: break-all;
+        }
+
+        /* =====================================================================
+           印刷・PDF出力専用ルール（書式ズレ・ページ跨ぎを完全に防止）
+           ===================================================================== */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                width: 210mm;
+                height: auto !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            header, aside, #zoom-bar, .no-print, #api-modal, #clear-modal, #loading-overlay, #toast {
+                display: none !important;
+            }
+            #workspace-wrapper {
+                display: block !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+            #preview-scroll-area {
+                display: block !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+            #pages-container {
+                transform: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 210mm !important;
+            }
+            .pdf-page {
+                width: 210mm !important;
+                height: 297mm !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+            .pdf-page:last-child {
+                page-break-after: auto !important;
+                break-after: auto !important;
+            }
         }
 
         /* =====================================================================
@@ -61,98 +114,85 @@
         /* 1. ネロリの小部屋（アロマと占いの部屋） */
         .theme-neroli {
             background-color: #fbf9f4;
-            color: #2f3e34;
-            background-image: radial-gradient(#d8e0d2 0.75px, transparent 0.75px);
+            color: #363e32;
+            background-image: radial-gradient(#d7decb 0.75px, transparent 0.75px);
             background-size: 20px 20px;
         }
         .theme-neroli .page-frame {
-            border: 1.5px solid #8ea68c;
-            outline: 1px solid #c5d3c3;
-            outline-offset: -6px;
+            border: 1px solid #9db08c;
+            box-shadow: inset 0 0 0 4px #fbf9f4, inset 0 0 0 5px #c5d1b8;
+            background-color: rgba(251, 249, 244, 0.96);
         }
-        .theme-neroli .accent-text { color: #557557; }
-        .theme-neroli .accent-bg { background-color: #eef3ec; border-color: #c5d3c3; }
-        .theme-neroli .divider-line { border-color: #b7c8b5; }
+        .theme-neroli .accent-text { color: #5b7548; }
+        .theme-neroli .accent-bg { background-color: #eef3e8; border-color: #c5d1b8; }
+        .theme-neroli .divider-line { border-color: #b7c6a9; }
 
         /* 2. イハネ（占星術と音楽） */
         .theme-ihane {
-            background-color: #0e1629;
-            color: #f1f5f9;
-            background-image:
-                radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
+            background: linear-gradient(160deg, #0d1326 0%, #162142 55%, #1d284d 100%);
+            color: #f3efe6;
         }
         .theme-ihane .page-frame {
-            border: 1.5px solid #c5a059;
-            outline: 1px solid rgba(197, 160, 89, 0.35);
-            outline-offset: -6px;
+            border: 1px solid rgba(218, 185, 115, 0.55);
+            box-shadow: inset 0 0 0 4px rgba(13, 19, 38, 0.6), inset 0 0 0 5px rgba(218, 185, 115, 0.28);
+            background-color: rgba(13, 19, 38, 0.45);
         }
-        .theme-ihane .accent-text { color: #e6c677; }
-        .theme-ihane .accent-bg { background-color: rgba(255, 255, 255, 0.05); border-color: rgba(197, 160, 89, 0.4); }
-        .theme-ihane .divider-line { border-color: rgba(197, 160, 89, 0.45); }
+        .theme-ihane .accent-text { color: #e6c67c; }
+        .theme-ihane .accent-bg { background-color: rgba(230, 198, 124, 0.1); border-color: rgba(230, 198, 124, 0.35); }
+        .theme-ihane .divider-line { border-color: rgba(230, 198, 124, 0.4); }
 
         /* 3. AI専属占い師ハルカ（AIとの関係と恋愛について） */
         .theme-haruka {
-            background-color: #fff9fb;
-            color: #432c39;
-            background-image:
-                radial-gradient(circle at 90% 10%, rgba(244, 114, 182, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 10% 90%, rgba(167, 139, 250, 0.12) 0%, transparent 40%);
+            background: linear-gradient(180deg, #fff8fa 0%, #fdf2f7 100%);
+            color: #4a3541;
         }
         .theme-haruka .page-frame {
-            border: 1.5px solid #e598b5;
-            outline: 1px solid #f5d0de;
-            outline-offset: -6px;
+            border: 1.5px solid #f0b6cd;
             border-radius: 16px;
+            box-shadow: inset 0 0 0 4px #fff9fb, inset 0 0 0 5px #f7d6e3;
+            background-color: rgba(255, 255, 255, 0.85);
         }
-        .theme-haruka .accent-text { color: #c84b7c; }
-        .theme-haruka .accent-bg { background-color: #fdf0f5; border-color: #f5c6d8; }
-        .theme-haruka .divider-line { border-color: #f2bdd2; }
+        .theme-haruka .accent-text { color: #c85a87; }
+        .theme-haruka .accent-bg { background-color: #fff0f6; border-color: #f5c6d9; }
+        .theme-haruka .divider-line { border-color: #eeb9cf; }
 
         /* カスタムスクロールバー */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e2e8f0;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="h-screen flex flex-col overflow-hidden text-slate-800">
 
     <!-- =====================================================================
-         上部コントロールバー
+         上部コントロールバー（ブランド切替・クリア・API設定・PDF保存）
          ===================================================================== -->
-    <header class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md z-20 shrink-0">
-        <!-- ロゴ＆タイトル -->
+    <header class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-md z-20 shrink-0">
+        <!-- アプリタイトル -->
         <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow">
-                <i class="fa-solid fa-wand-magic-sparkles text-white text-base"></i>
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-purple-500 flex items-center justify-center text-slate-950 font-bold shadow">
+                <i class="fa-solid fa-wand-sparkles"></i>
             </div>
             <div>
-                <h1 class="text-sm sm:text-base font-bold tracking-wide leading-tight">鑑定書＆タロットAIスタジオ</h1>
-                <p class="text-[11px] text-slate-400">Canvaページ別コピー＆3ブランド自動切替対応</p>
+                <h1 class="text-sm sm:text-base font-bold tracking-wide leading-tight">星詠み鑑定書＆タロットAIスタジオ</h1>
+                <p class="text-[11px] text-slate-400 hidden sm:block">P.1〜P.14自動認識・書式ズレゼロPDF＆Canvaワンクリックコピー</p>
             </div>
         </div>
 
-        <!-- 3ブランド切替タブ -->
-        <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 overflow-x-auto max-w-full">
-            <button onclick="switchBrand('neroli')" id="btn-brand-neroli" class="brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap bg-emerald-700 text-white shadow">
-                <span>🌿</span> ネロリの小部屋
+        <!-- 3ブランド切り替えタブ -->
+        <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 overflow-x-auto">
+            <button onclick="switchBrand('neroli')" id="btn-brand-neroli" class="brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition bg-emerald-600 text-white shadow">
+                <span>🌿</span>
+                <span>ネロリの小部屋</span>
             </button>
-            <button onclick="switchBrand('ihane')" id="btn-brand-ihane" class="brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap text-slate-300 hover:text-white">
-                <span>🎵</span> イハネ（占星術と音楽）
+            <button onclick="switchBrand('ihane')" id="btn-brand-ihane" class="brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition text-slate-300 hover:text-white">
+                <span>🎵</span>
+                <span>イハネ</span>
             </button>
-            <button onclick="switchBrand('haruka')" id="btn-brand-haruka" class="brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap text-slate-300 hover:text-white">
-                <span>💖</span> 占い師ハルカ
+            <button onclick="switchBrand('haruka')" id="btn-brand-haruka" class="brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition text-slate-300 hover:text-white">
+                <span>💖</span>
+                <span>占い師ハルカ</span>
             </button>
         </div>
 
@@ -161,7 +201,7 @@
             <!-- 中身クリアボタン -->
             <button onclick="openClearModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-rose-900/70 text-slate-200 hover:text-rose-200 border border-slate-600 hover:border-rose-500/50 flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-eraser"></i>
-                <span>中身をクリア</span>
+                <span>クリア</span>
             </button>
 
             <!-- Gemini API設定ボタン -->
@@ -169,23 +209,29 @@
                 <i class="fa-solid fa-key text-amber-400"></i>
                 <span id="api-status-text">Gemini API設定</span>
             </button>
+
+            <!-- PDF保存・印刷ボタン -->
+            <button onclick="printToPdf()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white shadow flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>PDFに保存</span>
+            </button>
         </div>
     </header>
 
     <!-- =====================================================================
-         メインワークスペース（左：入力＆タロットAIパネル / 右：14Pプレビュー＆コピー）
+         メインワークスペース（左：入力＆タロットAIパネル / 右：プレビュー＆PDF・Canva出力）
          ===================================================================== -->
-    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    <div id="workspace-wrapper" class="flex-1 flex flex-col lg:flex-row overflow-hidden">
 
         <!-- 左パネル：編集・構成・タロットAIツール -->
         <aside class="w-full lg:w-[440px] xl:w-[480px] bg-white border-r border-slate-200 flex flex-col h-[50vh] lg:h-full shrink-0 z-10 shadow-sm">
             <!-- 左パネル内サブタブ -->
             <div class="flex border-b border-slate-200 bg-slate-50 px-2 pt-2 gap-1 shrink-0 overflow-x-auto">
                 <button onclick="switchEditorTab('bulk')" id="tab-bulk" class="editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg border-t border-x border-slate-200 bg-white text-indigo-600 whitespace-nowrap">
-                    <i class="fa-solid fa-file-lines mr-1"></i>一括入力・分割
+                    <i class="fa-solid fa-file-lines mr-1"></i>鑑定文を貼り付け
                 </button>
                 <button onclick="switchEditorTab('pages')" id="tab-pages" class="editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg text-slate-500 hover:text-slate-800 whitespace-nowrap">
-                    <i class="fa-solid fa-book-open mr-1"></i>ページ別編集(14P)
+                    <i class="fa-solid fa-book-open mr-1"></i>ページ別微調整
                 </button>
                 <button onclick="switchEditorTab('tarot')" id="tab-tarot" class="editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1">
                     <span>🔮</span>タロット画像AI
@@ -195,22 +241,22 @@
                 </button>
             </div>
 
-            <!-- タブ1：一括入力＆自動分割 -->
-            <div id="panel-bulk" class="p-4 flex-1 overflow-y-auto space-y-4">
-                <div class="bg-indigo-50/80 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-950 space-y-1.5">
+            <!-- タブ1：一括貼り付け＆自動ページ反映 -->
+            <div id="panel-bulk" class="p-4 flex-1 overflow-y-auto space-y-3.5">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950 space-y-1.5">
                     <div class="font-bold flex items-center justify-between">
-                        <span><i class="fa-solid fa-wand-sparkles text-indigo-600 mr-1"></i>Canva貼り付け用・14ページ自動分割</span>
-                        <span id="total-char-count" class="bg-white px-2 py-0.5 rounded-full text-indigo-700 font-mono border border-indigo-200">0 文字</span>
+                        <span><i class="fa-solid fa-check-circle text-emerald-600 mr-1"></i>「=== 【P.1】 タイトル ===」形式に完全対応</span>
+                        <span id="total-char-count" class="bg-white px-2 py-0.5 rounded-full text-emerald-700 font-mono border border-emerald-200">0 文字</span>
                     </div>
-                    <p class="text-[11px] text-indigo-800 leading-relaxed">
-                        鑑定文を貼り付けて分割すると、A4下端まで美しく埋まる分量（1ページ約950〜1,050字）で14ページに割り振ります。右側の各ページからCanvaへ1Pずつコピーできます。
+                    <p class="text-[11px] text-emerald-800 leading-relaxed">
+                        お手持ちの鑑定書をそのまま貼り付けて下のボタンを押すだけで、<strong>P.1〜P.14の見出しと本文を自動で分離し、ページをまたがずピタッと配置</strong>します。
                     </p>
                 </div>
 
                 <!-- クイック操作バー -->
                 <div class="flex flex-wrap gap-2">
                     <button onclick="loadSampleData()" class="flex-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-sparkles text-amber-500"></i> サンプルを再読込
+                        <i class="fa-solid fa-sparkles text-amber-500"></i> サンプルを読込
                     </button>
                     <button onclick="openClearModal()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold px-3 py-2 rounded-lg transition flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-trash-can"></i> 中身をクリア
@@ -218,169 +264,165 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">鑑定書テキスト（長文ペースト欄）</label>
-                    <textarea id="bulk-input" rows="10" oninput="updateBulkCharCount()" placeholder="ここに占星術・サビアンシンボルの鑑定文を貼り付けてください..." class="w-full p-3 text-xs leading-relaxed border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">鑑定書テキスト（ここにそのまま貼り付け）</label>
+                    <textarea id="bulk-input" rows="12" oninput="updateBulkCharCount()" placeholder="=== 【P.1】 表紙・プロローグ ===&#10;ネロリの小部屋へようこそ...&#10;&#10;=== 【P.2】 第1章：魂の本質... ===&#10;..." class="w-full p-3 text-xs leading-relaxed border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 gap-2">
-                    <button onclick="autoDistributeText()" class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-2 transition">
-                        <i class="fa-solid fa-scissors"></i> テキストを14ページ（各約950字）に自動分割する
-                    </button>
+                <!-- メイン反映ボタン（迷わない1本化） -->
+                <button onclick="parseAndApplyReadingText()" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 鑑定文をページごとに反映する（書式ズレ防止）
+                </button>
 
-                    <button onclick="aiFormatAndExpand()" class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-2 transition">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AIでブランド口調＆14P構成に自動整形
-                    </button>
+                <div class="flex items-center justify-between pt-1">
+                    <label class="inline-flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
+                        <input type="checkbox" id="hide-empty-pages" checked onchange="renderAllPages()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                        <span>文章が入っていない空白ページは非表示にする</span>
+                    </label>
                 </div>
             </div>
 
-            <!-- タブ2：ページ別編集（1〜14P） -->
-            <div id="panel-pages" class="p-4 flex-1 overflow-y-auto hidden space-y-3">
+            <!-- タブ2：ページ別微調整（1P〜14P） -->
+            <div id="panel-pages" class="p-4 flex-1 overflow-y-auto space-y-4 hidden">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-slate-700">編集するページを選択</label>
-                    <select id="page-selector" onchange="renderSinglePageEditor()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold bg-white">
-                        <!-- JSで1〜14Pを生成 -->
+                    <select id="page-selector" onchange="renderSinglePageEditor()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <!-- JSで1〜14ページを生成 -->
                     </select>
                 </div>
 
-                <div id="single-page-editor-box" class="space-y-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div id="single-page-editor-fields" class="space-y-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 mb-1">章タイトル / 見出し</label>
-                        <input type="text" id="single-page-title" oninput="saveSinglePageEdit()" class="w-full p-2 text-xs font-bold border border-slate-300 rounded-lg bg-white">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">章タイトル / 見出し</label>
+                        <input type="text" id="edit-page-title" oninput="saveSinglePageEdit()" class="w-full p-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 mb-1">サブタイトル / サビアン度数など</label>
-                        <input type="text" id="single-page-subtitle" oninput="saveSinglePageEdit()" class="w-full p-2 text-xs border border-slate-300 rounded-lg bg-white">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">サブタイトル / キーワード</label>
+                        <input type="text" id="edit-page-subtitle" oninput="saveSinglePageEdit()" class="w-full p-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-[11px] font-bold text-slate-500">本文（A4下まで綺麗に埋まる目安：900〜1,050文字）</label>
-                            <span id="single-page-chars" class="text-[11px] font-mono text-indigo-600 font-bold">0 文字</span>
+                            <label class="text-xs font-bold text-slate-600">本文（目安：750〜1,050文字）</label>
+                            <span id="single-page-chars" class="text-[11px] font-mono text-slate-500">0 文字</span>
                         </div>
-                        <textarea id="single-page-body" rows="13" oninput="saveSinglePageEdit()" class="w-full p-2.5 text-xs border border-slate-300 rounded-lg bg-white leading-relaxed"></textarea>
+                        <textarea id="edit-page-body" rows="13" oninput="saveSinglePageEdit()" class="w-full p-3 text-xs leading-relaxed border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                     </div>
-                    <button onclick="copyPageToClipboard(parseInt(document.getElementById('page-selector').value, 10))" class="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-regular fa-copy"></i> このページのテキストをCanva用にコピー
-                    </button>
                 </div>
             </div>
 
-            <!-- タブ3：タロット画像読み込み＆AI鑑定 -->
-            <div id="panel-tarot" class="p-4 flex-1 overflow-y-auto hidden space-y-4">
-                <div class="bg-purple-50 border border-purple-200 rounded-xl p-3 text-xs text-purple-950 space-y-1">
-                    <div class="font-bold flex items-center gap-1.5">
-                        <span>🔮</span>
-                        <span>タロット画像AIリーディング（3ブランド対応）</span>
+            <!-- タブ3：タロット画像読み込み＆3ブランド別AIリーディング -->
+            <div id="panel-tarot" class="p-4 flex-1 overflow-y-auto space-y-3.5 hidden">
+                <div class="bg-purple-50 border border-purple-200 rounded-xl p-3 text-xs text-purple-900 space-y-1">
+                    <div class="font-bold flex items-center justify-between">
+                        <span>🔮 タロット写真AIリーディング</span>
+                        <span id="tarot-brand-badge" class="px-2 py-0.5 rounded-full bg-white text-purple-700 text-[10px] font-bold border border-purple-200">ネロリの小部屋モード</span>
                     </div>
-                    <p class="text-[11px] text-purple-800 leading-relaxed">
-                        引いたタロットカードの写真をアップロードし、相談内容を入力すると、現在選択中のブランド（<strong id="tarot-current-brand-label" class="underline">ネロリの小部屋</strong>）の世界観でA4・1ページ分（約950〜1,050字）のタロット鑑定文を作成します。
+                    <p class="text-[11px] text-purple-700 leading-relaxed">
+                        展開したタロットカードの写真と「占いの内容・相談テーマ」を入れると、Geminiが絵柄と正逆を読み取り、選択中ブランドの口調で鑑定結果を作成します。
                     </p>
                 </div>
 
-                <!-- 1. タロット画像アップロード -->
+                <!-- タロット画像アップロード枠 -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">① タロット展開の写真をアップロード</label>
-                    <label for="tarot-image-input" id="tarot-dropzone" class="flex flex-col items-center justify-center w-full min-h-[130px] border-2 border-dashed border-purple-300 hover:border-purple-500 rounded-xl bg-purple-50/40 hover:bg-purple-50 cursor-pointer transition p-3 text-center relative overflow-hidden">
-                        <div id="tarot-upload-placeholder" class="space-y-1.5">
-                            <i class="fa-solid fa-camera-retro text-2xl text-purple-500"></i>
-                            <p class="text-xs font-bold text-slate-700">クリックしてタロット画像を選択</p>
-                            <p class="text-[10px] text-slate-500">JPG / PNG / WebP 対応（1枚引き〜複数枚スプレッド可）</p>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">1. タロットカードの写真をアップロード</label>
+                    <label for="tarot-image-input" class="block border-2 border-dashed border-slate-300 hover:border-purple-400 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50 hover:bg-purple-50/40">
+                        <input type="file" id="tarot-image-input" accept="image/*" onchange="handleTarotImageUpload(event)" class="hidden">
+                        <div id="tarot-upload-placeholder" class="py-3 space-y-1">
+                            <i class="fa-solid fa-camera-retro text-2xl text-purple-400"></i>
+                            <p class="text-xs font-bold text-slate-600">クリックしてタロット画像を選択</p>
+                            <p class="text-[10px] text-slate-400">1枚引き・3枚引き・ヘキサグラム等の写真に対応</p>
                         </div>
-                        <img id="tarot-preview-img" src="" alt="タロットプレビュー" class="hidden max-h-44 rounded-lg shadow object-contain">
-                        <input id="tarot-image-input" type="file" accept="image/*" onchange="handleTarotImageUpload(event)" class="hidden">
+                        <div id="tarot-preview-wrapper" class="hidden relative">
+                            <img id="tarot-image-preview" src="" alt="タロットカードプレビュー" class="max-h-40 mx-auto rounded-lg shadow-sm object-contain">
+                            <button type="button" onclick="clearTarotImage(event)" class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-800 text-white text-[10px] hover:bg-rose-600 transition">
+                                <i class="fa-solid fa-xmark"></i> 画像を削除
+                            </button>
+                        </div>
                     </label>
-                    <div id="tarot-img-actions" class="hidden flex justify-end mt-1">
-                        <button onclick="clearTarotImage()" class="text-[11px] text-rose-600 hover:underline font-semibold">
-                            <i class="fa-solid fa-xmark mr-0.5"></i>画像を削除
-                        </button>
-                    </div>
                 </div>
 
-                <!-- 2. 占いの内容・相談テーマ入力 -->
+                <!-- 占いの内容・テーマ入力 -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">② 占いの内容・相談テーマ（スプレッドの意味など）</label>
-                    <textarea id="tarot-context-input" rows="4" placeholder="例：今後3ヶ月の恋愛運と、お相手との距離を縮めるためのアドバイス。左から「過去・現在・未来・アドバイス」の4枚引きです。" class="w-full p-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none leading-relaxed"></textarea>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">2. 占いの内容・相談テーマ（スプレッドの意味など）</label>
+                    <textarea id="tarot-context-input" rows="3" placeholder="例：現在の片思いの相手との今後の展開について3枚引き（過去・現在・未来）で占いました。／現在の心のブロックを外すためのアドバイスカードです。" class="w-full p-2.5 text-xs leading-relaxed border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"></textarea>
                 </div>
 
-                <!-- 3. 生成ボタン -->
-                <button onclick="generateTarotReading()" class="w-full py-2.5 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-2 transition">
-                    <i class="fa-solid fa-sparkles"></i> 画像と内容からタロット鑑定文を生成する
+                <!-- 生成実行ボタン -->
+                <button onclick="generateTarotReadingWithGemini()" class="w-full py-2.5 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>画像を読み込んでタロット鑑定を生成</span>
                 </button>
 
-                <!-- 4. 生成結果＆反映ボタン -->
-                <div id="tarot-result-box" class="space-y-2 pt-2 border-t border-slate-200">
+                <!-- 生成されたタロット鑑定結果 -->
+                <div class="pt-1 border-t border-slate-200 space-y-2">
                     <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-slate-700">生成されたタロット鑑定結果</label>
-                        <span id="tarot-result-chars" class="text-[11px] font-mono text-purple-600 font-bold">0 文字</span>
+                        <label class="text-xs font-bold text-slate-700">3. 生成されたタロット鑑定文</label>
+                        <span id="tarot-result-chars" class="text-[11px] font-mono text-slate-500">0 文字</span>
                     </div>
-                    <textarea id="tarot-result-output" rows="8" oninput="updateTarotResultCount()" placeholder="ここにAIが読み取ったカード名と鑑定メッセージが生成されます..." class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-slate-50 focus:bg-white leading-relaxed"></textarea>
+                    <textarea id="tarot-result-output" rows="7" oninput="document.getElementById('tarot-result-chars').textContent = this.value.length + ' 文字'" placeholder="ここに選択したブランド（ネロリの小部屋／イハネ／ハルカ）の口調でタロット鑑定文が出力されます..." class="w-full p-2.5 text-xs leading-relaxed border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none"></textarea>
 
                     <div class="grid grid-cols-2 gap-2">
                         <button onclick="copyTarotResultOnly()" class="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
                             <i class="fa-regular fa-copy"></i> 結果だけコピー
                         </button>
-                        <button onclick="applyTarotToPage14()" class="py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
-                            <i class="fa-solid fa-file-import"></i> 14P目に反映する
+                        <button onclick="applyTarotToPages15And16()" class="py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-file-import"></i> 15P・16Pに反映
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- タブ4：表紙・ブランド固有設定（イハネ歌詞・ハルカ恋愛設定など） -->
-            <div id="panel-meta" class="p-4 flex-1 overflow-y-auto hidden space-y-4">
+            <!-- タブ4：表紙・ブランド固有設定（イハネの楽曲・歌詞含む） -->
+            <div id="panel-meta" class="p-4 flex-1 overflow-y-auto space-y-4 hidden">
                 <div class="space-y-3">
-                    <h3 class="text-xs font-bold text-slate-800 border-b pb-1">基本情報（表紙・フッター共通）</h3>
+                    <h3 class="text-xs font-bold text-slate-700 border-b pb-1">基本表紙情報</h3>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-600 mb-1">鑑定書のメインタイトル</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">鑑定書タイトル</label>
                         <input type="text" id="meta-title" value="星とサビアンが紡ぐ 魂の羅針盤" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-600 mb-1">サブタイトル</label>
-                        <input type="text" id="meta-subtitle" value="〜 14の象徴から紐解くあなたの個性・才能・愛の軌跡 〜" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">サブタイトル</label>
+                        <input type="text" id="meta-subtitle" value="〜 あなたの個性・才能・愛の軌跡 〜" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">お客様のお名前</label>
-                            <input type="text" id="meta-client" value="星野 みなみ 様" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">お客様のお名前</label>
+                            <input type="text" id="meta-client" value="サンプル 様" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">鑑定日</label>
-                            <input type="text" id="meta-date" value="2026年11月23日" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">鑑定日</label>
+                            <input type="text" id="meta-date" value="2026年11月24日" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                         </div>
                     </div>
                 </div>
 
-                <!-- ネロリの小部屋 専用設定 -->
-                <div id="brand-specific-neroli" class="space-y-2 bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
-                    <h3 class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                        <span>🌿</span> ネロリの小部屋：お守りアロマ処方
-                    </h3>
+                <!-- ネロリの小部屋専用フィールド -->
+                <div id="brand-meta-neroli" class="space-y-3 pt-2 border-t border-slate-200">
+                    <h3 class="text-xs font-bold text-emerald-700 flex items-center gap-1">🌿 ネロリの小部屋・アロマ処方</h3>
                     <div>
-                        <label class="block text-[11px] font-bold text-emerald-800 mb-1">おすすめのブレンド精油</label>
-                        <input type="text" id="neroli-aroma" value="ネロリ × フランキンセンス × スイートオレンジ" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-emerald-300 rounded-lg bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">お守りブレンド精油（表紙に表示）</label>
+                        <input type="text" id="meta-neroli-aroma" value="ネロリ × ベルガモット × サンダルウッド" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                     </div>
                 </div>
 
-                <!-- イハネ 専用設定（音楽・歌詞） -->
-                <div id="brand-specific-ihane" class="hidden space-y-2.5 bg-indigo-950 text-white p-3.5 rounded-xl border border-amber-400/40">
+                <!-- イハネ専用フィールド（楽曲・歌詞） -->
+                <div id="brand-meta-ihane" class="space-y-3 pt-2 border-t border-slate-200 hidden">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                            <span>🎵</span> イハネ：イメージ楽曲＆歌詞（13P目に反映）
-                        </h3>
-                        <button onclick="generateIhaneLyricsWithAI()" class="text-[11px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg transition">
-                            <i class="fa-solid fa-music mr-1"></i>AIで歌詞を生成
+                        <h3 class="text-xs font-bold text-indigo-700 flex items-center gap-1">🎵 イハネ・テーマ楽曲＆歌詞（13ページ目）</h3>
+                        <button onclick="generateLyricsWithGemini()" class="text-[11px] bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-md font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-music"></i> AIで歌詞生成
                         </button>
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-300 mb-1">テーマ楽曲タイトル</label>
-                        <input type="text" id="ihane-song-title" value="星屑のプレリュード（Prelude of Stardust）" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-600 rounded-lg bg-slate-900 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">楽曲タイトル</label>
+                        <input type="text" id="meta-ihane-song-title" value="星屑のプレリュード（Prelude of Stardust）" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-300 mb-1">メロディ・音色のイメージ</label>
-                        <input type="text" id="ihane-song-style" value="夜明けのハープと静かなピアノ、432Hzの癒やしの旋律" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-600 rounded-lg bg-slate-900 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">曲調・イメージ楽器</label>
+                        <input type="text" id="meta-ihane-song-style" value="夜明けのハープと静かなピアノ、432Hzの癒やしの旋律" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-300 mb-1">歌詞（オリジナル詩）</label>
-                        <textarea id="ihane-lyrics" rows="7" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-600 rounded-lg bg-slate-900 text-amber-100 leading-relaxed font-mincho">夜空に散らばる　小さな光の粒
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">オリジナル歌詞（13ページ目に掲載）</label>
+                        <textarea id="meta-ihane-lyrics" rows="7" oninput="updateStateFromInputs()" class="w-full p-2.5 text-xs leading-relaxed border border-slate-300 rounded-lg">夜空に散らばる　小さな光の粒
 まだ名前のない　あなたの物語
 そっと耳を澄ませば　聴こえてくるメロディ
 迷いさえも　美しい和音に変わるから
@@ -390,35 +432,33 @@
                     </div>
                 </div>
 
-                <!-- AI専属占い師ハルカ 専用設定 -->
-                <div id="brand-specific-haruka" class="hidden space-y-2 bg-pink-50 p-3 rounded-xl border border-pink-200">
-                    <h3 class="text-xs font-bold text-pink-900 flex items-center gap-1.5">
-                        <span>💖</span> 占い師ハルカ：恋愛＆AIシンクロ率
-                    </h3>
+                <!-- 占い師ハルカ専用フィールド -->
+                <div id="brand-meta-haruka" class="space-y-3 pt-2 border-t border-slate-200 hidden">
+                    <h3 class="text-xs font-bold text-pink-600 flex items-center gap-1">💖 AI専属占い師ハルカ・メッセージ設定</h3>
                     <div>
-                        <label class="block text-[11px] font-bold text-pink-800 mb-1">ハルカからの一言メッセージ</label>
-                        <input type="text" id="haruka-tagline" value="あなたの恋と心の波長、ハルカがいつでもそばで受け止めるね♡" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-pink-300 rounded-lg bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ハルカからの一言キャッチコピー（表紙に表示）</label>
+                        <input type="text" id="meta-haruka-tagline" value="あなたの恋と心の波長、ハルカがいつでもそばで受け止めるね♡" oninput="updateStateFromInputs()" class="w-full p-2 text-xs border border-slate-300 rounded-lg">
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- 右パネル：14ページ・Canva用プレビューエリア -->
+        <!-- 右パネル：14ページ・PDF＆Canva用プレビューエリア -->
         <main class="flex-1 bg-slate-200/80 overflow-y-auto p-4 sm:p-8 relative" id="preview-scroll-area">
             <!-- ズーム＆ガイドバー -->
-            <div class="sticky top-0 z-10 flex justify-center mb-5 pointer-events-none">
+            <div id="zoom-bar" class="sticky top-0 z-10 flex justify-center mb-5 pointer-events-none no-print">
                 <div class="bg-white/95 backdrop-blur border border-slate-300 shadow-md rounded-full px-4 py-1.5 flex items-center gap-3 pointer-events-auto text-xs">
-                    <span class="font-bold text-slate-700"><i class="fa-solid fa-layer-group text-indigo-500 mr-1.5"></i>全14ページ構成（各ページの右上ボタンでCanvaへコピー）</span>
+                    <span class="font-bold text-slate-700"><i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i>右上の「PDFに保存」でA4・1ページずつ綺麗に出力できます</span>
                     <div class="h-3.5 w-[1px] bg-slate-300"></div>
                     <button onclick="changeZoom(-0.1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center font-bold">-</button>
-                    <span id="zoom-label" class="font-mono font-bold w-10 text-center">85%</span>
+                    <span id="zoom-label" class="font-mono font-bold w-10 text-center">80%</span>
                     <button onclick="changeZoom(0.1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center font-bold">+</button>
                 </div>
             </div>
 
             <!-- 14ページがレンダリングされるコンテナ -->
-            <div id="pages-container" class="origin-top transition-transform duration-200 pb-16" style="transform: scale(0.85);">
-                <!-- JSで14ページ分のDOMを生成 -->
+            <div id="pages-container" class="origin-top transition-transform duration-200 pb-16" style="transform: scale(0.8);">
+                <!-- JSでページDOMを生成 -->
             </div>
         </main>
     </div>
@@ -426,110 +466,114 @@
     <!-- =====================================================================
          Gemini API キー設定モーダル
          ===================================================================== -->
-    <div id="api-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-key text-amber-500"></i> Gemini APIキー設定
-                </h2>
+    <div id="api-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-500"></i>
+                    <span>Gemini API キー設定</span>
+                </h3>
                 <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-                Google AI Studioで取得したGemini APIキーを入力すると、<strong>タロット画像の読み取り鑑定・3ブランド口調での文章自動整形・イハネの歌詞自動生成</strong>が利用できます。<br>
-                <span class="text-emerald-700 font-semibold">※キーはお使いのブラウザ（localStorage）にのみ保存され、外部サーバーへ送信されることはありません。</span>
+                Google AI Studio で取得した Gemini API キーを入力してください。キーはお使いのブラウザ内（localStorage）にのみ保存され、タロット画像AI鑑定や歌詞生成に使用されます。
             </p>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Gemini API Key</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">API キー（AIza...）</label>
                 <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="clearApiKey()" class="px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition">キーを削除</button>
-                <button onclick="saveApiKey()" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow transition">保存して閉じる</button>
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="clearApiKey()" class="text-xs text-rose-600 hover:underline font-semibold">キーを削除</button>
+                <div class="flex gap-2">
+                    <button onclick="closeApiModal()" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">キャンセル</button>
+                    <button onclick="saveApiKey()" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow">保存する</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- =====================================================================
-         中身クリア確認モーダル（alert/confirmの代替）
+         中身クリア確認モーダル
          ===================================================================== -->
-    <div id="clear-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+    <div id="clear-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center gap-2.5 text-rose-600">
                 <div class="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-eraser text-base"></i>
+                    <i class="fa-solid fa-eraser"></i>
                 </div>
-                <h2 class="text-base font-bold text-slate-800">中身をすべてクリアしますか？</h2>
+                <h3 class="text-base font-bold text-slate-800">中身をすべてクリアしますか？</h3>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-                現在入力されている一括テキスト、全14ページの本文、およびタロット鑑定結果の入力欄をすべて空の状態にリセットします。
+                入力欄の鑑定テキストや各ページの本文、タロット画像をすべて空の状態にリセットします。（Gemini APIキーは保持されます）
             </p>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeClearModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition">キャンセル</button>
-                <button onclick="executeClearAll()" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow transition">すべてクリアする</button>
+                <button onclick="closeClearModal()" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">キャンセル</button>
+                <button onclick="executeClearAll()" class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow">すべてクリアする</button>
             </div>
         </div>
     </div>
 
-    <!-- =====================================================================
-         ローディング＆通知トースト
-         ===================================================================== -->
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center">
-        <div class="bg-white px-6 py-5 rounded-2xl shadow-xl flex flex-col items-center gap-3">
-            <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-            <p id="loading-text" class="text-xs font-bold text-slate-700">Gemini AIがリーディングを紡いでいます...</p>
+    <!-- AI処理中オーバーレイ -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full text-center space-y-3 shadow-2xl">
+            <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
+            <p id="loading-message" class="text-sm font-bold text-slate-800">Gemini AIがリーディング中...</p>
+            <p class="text-xs text-slate-500">ブランドの世界観に合わせて文章を紡いでいます</p>
         </div>
     </div>
 
+    <!-- 通知トースト -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toast-message">通知メッセージ</span>
+        <span id="toast-text">完了しました</span>
     </div>
 
     <!-- =====================================================================
-         アプリケーションロジック
+         アプリケーションロジック (JavaScript)
          ===================================================================== -->
     <script>
         // アプリ全体の状態管理
         let currentBrand = 'neroli';
-        let currentZoom = 0.85;
+        let currentZoom = 0.80;
         let tarotImageBase64 = null;
-        let tarotImageMimeType = null;
-
-        // 14ページ分のデフォルト章構成
+        // 16ページ分のデフォルト章構成（P.1〜P.14：占星術 / P.15〜P.16：ケルト十字タロット2ページ）
         const defaultChapters = [
-            { title: "表紙", subtitle: "ホロスコープ＆サビアンシンボル特別鑑定書" },
-            { title: "第1章：あなたの魂の設計図と全体の輝き", subtitle: "出生図が示す本質的なテーマと人生の方向性" },
-            { title: "第2章：太陽のサビアンシンボル", subtitle: "人生の目的・社会で放つあなただけの光" },
-            { title: "第3章：月のサビアンシンボル", subtitle: "心の安らぎ・素顔の感情と癒やしの源泉" },
-            { title: "第4章：水星のサビアンシンボル", subtitle: "知性の働き・言葉のセンスと学びの才能" },
-            { title: "第5章：金星のサビアンシンボル", subtitle: "愛され力・美意識と心をときめかせる魅力" },
-            { title: "第6章：火星のサビアンシンボル", subtitle: "情熱のスイッチ・行動力と未来を切り拓く力" },
-            { title: "第7章：木星のサビアンシンボル", subtitle: "幸運の拡大ポイント・自然と引き寄せる豊かさ" },
-            { title: "第8章：土星のサビアンシンボル", subtitle: "魂の課題と成熟・揺るぎない信頼を築く鍵" },
-            { title: "第9章：アセンダントのサビアンシンボル", subtitle: "第一印象のオーラ・世界と出会うときの仮面" },
-            { title: "第10章：MC（天頂）のサビアンシンボル", subtitle: "天職と社会的使命・あなたが辿り着く頂" },
-            { title: "第11章：ノード軸が示すご縁と魂の成長", subtitle: "過去世からの贈り物と今世で目指す未来" },
-            { title: "第12章：特別リーディング＆共鳴メッセージ", subtitle: "星々の響きを日常に活かすための処方箋" },
-            { title: "最終章：タロット特別メッセージ＆祝福", subtitle: "今のあなたへ贈るカードの導きと未来へのエール" }
+            { title: "表紙・プロローグ", subtitle: "ホロスコープ＆サビアンシンボル特別鑑定書" },
+            { title: "第1章：魂の本質と持って生まれた才能 ①", subtitle: "太陽と水星が示すあなたの光" },
+            { title: "第1章：魂の本質と持って生まれた才能 ②", subtitle: "月と金星が示す心の安心感と魅力" },
+            { title: "第1章：魂の本質と持って生まれた才能 ③", subtitle: "火星と木星が広げる情熱と幸運の扉" },
+            { title: "第1章：魂の本質と持って生まれた才能 ④", subtitle: "土星・外惑星が授ける深い智慧と使命" },
+            { title: "第1章：魂の本質と持って生まれた才能 ⑤", subtitle: "ドラゴンヘッド＆テイルが示す今世の物語" },
+            { title: "第1章：魂の本質と持って生まれた才能 ⑥", subtitle: "天体のアスペクトが織りなす才能のハーモニー" },
+            { title: "第2章：現在進行形の内面テーマ ①", subtitle: "プログレスの太陽と月が照らす「今の心の季節」" },
+            { title: "第2章：現在進行形の内面テーマ ②", subtitle: "心の成長と変化のステップ" },
+            { title: "第3章：未来への羅針盤とトランジット ①", subtitle: "これからの運気の流れと転機" },
+            { title: "第3章：未来への羅針盤とトランジット ②", subtitle: "大切なご縁と人間関係の広がり" },
+            { title: "第3章：未来への羅針盤とトランジット ③", subtitle: "自分らしく輝くためのヒント" },
+            { title: "特別処方箋：スペシャルギフト", subtitle: "日常に寄り添うお守りメッセージ" },
+            { title: "エピローグ：星々からの祝福のメッセージ", subtitle: "あなたの未来を照らす愛と光のエール" },
+            { title: "特別付録：ケルト十字タロット鑑定 ①", subtitle: "現状・深層心理・過去から近未来への流れ（1〜6枚目）" },
+            { title: "特別付録：ケルト十字タロット鑑定 ②", subtitle: "本音・周囲の環境・最終結果とお守りメッセージ（7〜10枚目）" }
         ];
 
-        // ページごとの編集データ保持配列（14ページ分）
+        // ページごとの編集データ保持配列（16ページ分）
         let pagesData = defaultChapters.map((ch, idx) => ({
             pageNumber: idx + 1,
             title: ch.title,
             subtitle: ch.subtitle,
-            body: ""
+            body: "",
+            hasContent: false
         }));
 
         // メタデータ
         let metaData = {
             title: "星とサビアンが紡ぐ 魂の羅針盤",
-            subtitle: "〜 14の象徴から紐解くあなたの個性・才能・愛の軌跡 〜",
-            client: "星野 みなみ 様",
-            date: "2026年11月23日",
-            neroliAroma: "ネロリ × フランキンセンス × スイートオレンジ",
+            subtitle: "〜 あなたの個性・才能・愛の軌跡 〜",
+            client: "サンプル 様",
+            date: "2026年11月24日",
+            neroliAroma: "ネロリ × ベルガモット × サンダルウッド",
             ihaneSongTitle: "星屑のプレリュード（Prelude of Stardust）",
             ihaneSongStyle: "夜明けのハープと静かなピアノ、432Hzの癒やしの旋律",
             ihaneLyrics: "夜空に散らばる　小さな光の粒\nまだ名前のない　あなたの物語\nそっと耳を澄ませば　聴こえてくるメロディ\n迷いさえも　美しい和音に変わるから\n\n巡る星たちの　導くままに\nあなただけの音色を　奏でてゆこう",
@@ -544,16 +588,18 @@
             switchBrand('neroli');
         };
 
-        // ページ選択ドロップダウンの初期化
+        // ページ選択プルダウンの初期化
         function initPageSelector() {
-            const selector = document.getElementById('page-selector');
-            selector.innerHTML = '';
+            const sel = document.getElementById('page-selector');
+            const prevVal = sel.value || 0;
+            sel.innerHTML = '';
             pagesData.forEach((p, idx) => {
                 const opt = document.createElement('option');
                 opt.value = idx;
-                opt.textContent = `${p.pageNumber}ページ目：${p.title}`;
-                selector.appendChild(opt);
+                opt.textContent = `P.${p.pageNumber}：${p.title}`;
+                sel.appendChild(opt);
             });
+            sel.value = prevVal;
             renderSinglePageEditor();
         }
 
@@ -561,64 +607,61 @@
         function switchBrand(brand) {
             currentBrand = brand;
 
-            // タブのアクティブ表示更新
+            // 上部タブの見た目更新
             document.querySelectorAll('.brand-tab').forEach(btn => {
-                btn.className = "brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap text-slate-300 hover:text-white";
+                btn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition text-slate-300 hover:text-white';
             });
             const activeBtn = document.getElementById(`btn-brand-${brand}`);
             if (brand === 'neroli') {
-                activeBtn.className = "brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap bg-emerald-700 text-white shadow";
-                document.getElementById('tarot-current-brand-label').textContent = 'ネロリの小部屋（アロマと占い）';
+                activeBtn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition bg-emerald-600 text-white shadow';
             } else if (brand === 'ihane') {
-                activeBtn.className = "brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap bg-amber-600 text-slate-950 shadow";
-                document.getElementById('tarot-current-brand-label').textContent = 'イハネ（占星術と音楽）';
-            } else if (brand === 'haruka') {
-                activeBtn.className = "brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition whitespace-nowrap bg-pink-600 text-white shadow";
-                document.getElementById('tarot-current-brand-label').textContent = 'AI専属占い師ハルカ（恋愛・AI）';
+                activeBtn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition bg-indigo-600 text-white shadow';
+            } else {
+                activeBtn.className = 'brand-tab px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition bg-pink-600 text-white shadow';
             }
 
-            // ブランド固有設定パネルの表示切り替え
-            document.getElementById('brand-specific-neroli').classList.toggle('hidden', brand !== 'neroli');
-            document.getElementById('brand-specific-ihane').classList.toggle('hidden', brand !== 'ihane');
-            document.getElementById('brand-specific-haruka').classList.toggle('hidden', brand !== 'haruka');
+            // タロットタブのブランドバッジ更新
+            const badge = document.getElementById('tarot-brand-badge');
+            if (badge) {
+                badge.textContent = brand === 'neroli'
+                    ? '🌿 ネロリの小部屋モード'
+                    : brand === 'ihane'
+                        ? '🎵 イハネ（星と音楽）モード'
+                        : '💖 AI占い師ハルカモード';
+            }
 
-            // 13ページ目の見出しをイハネの場合は音楽専用に自動調整
-            if (brand === 'ihane') {
+            // メタ設定パネル内のブランド別セクション切替
+            document.getElementById('brand-meta-neroli').classList.toggle('hidden', brand !== 'neroli');
+            document.getElementById('brand-meta-ihane').classList.toggle('hidden', brand !== 'ihane');
+            document.getElementById('brand-meta-haruka').classList.toggle('hidden', brand !== 'haruka');
+
+            // 13ページ目の見出しをイハネの場合は音楽専用に自動調整（まだユーザーテキストが入っていない場合）
+            if (brand === 'ihane' && !pagesData[12].hasContent) {
                 pagesData[12].title = "第12章：あなたに捧げる星の旋律と詩";
                 pagesData[12].subtitle = `Theme Song: ${metaData.ihaneSongTitle}`;
-            } else if (brand === 'haruka') {
+            } else if (brand === 'haruka' && !pagesData[12].hasContent) {
                 pagesData[12].title = "第12章：ハルカが読み解く愛とシンクロの未来";
                 pagesData[12].subtitle = "大切な人・AIとの心の繋がりを深める秘訣";
-            } else {
-                pagesData[12].title = "第12章：星と香りのハーモニー処方箋";
-                pagesData[12].subtitle = "日常に癒やしと輝きをもたらすアロマと星の習慣";
             }
 
             initPageSelector();
             renderAllPages();
         }
 
-        // 左パネルのサブタブ切り替え
-        function switchEditorTab(tab) {
+        // 左パネル内のサブタブ切り替え
+        function switchEditorTab(tabName) {
             ['bulk', 'pages', 'tarot', 'meta'].forEach(t => {
+                document.getElementById(`panel-${t}`).classList.toggle('hidden', t !== tabName);
                 const btn = document.getElementById(`tab-${t}`);
-                const panel = document.getElementById(`panel-${t}`);
-                if (t === tab) {
-                    btn.className = "editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg border-t border-x border-slate-200 bg-white text-indigo-600 whitespace-nowrap";
-                    panel.classList.remove('hidden');
+                if (t === tabName) {
+                    btn.className = 'editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg border-t border-x border-slate-200 bg-white text-indigo-600 whitespace-nowrap flex items-center gap-1';
                 } else {
-                    btn.className = "editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg text-slate-500 hover:text-slate-800 whitespace-nowrap";
-                    panel.classList.add('hidden');
+                    btn.className = 'editor-tab px-2.5 py-2 text-xs font-bold rounded-t-lg text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1';
                 }
             });
-            if (tab === 'pages') renderSinglePageEditor();
-        }
-
-        // ズーム変更
-        function changeZoom(delta) {
-            currentZoom = Math.min(1.2, Math.max(0.45, Math.round((currentZoom + delta) * 100) / 100));
-            document.getElementById('pages-container').style.transform = `scale(${currentZoom})`;
-            document.getElementById('zoom-label').textContent = `${Math.round(currentZoom * 100)}%`;
+            if (tabName === 'pages') {
+                renderSinglePageEditor();
+            }
         }
 
         // 文字数カウント更新
@@ -627,113 +670,173 @@
             document.getElementById('total-char-count').textContent = `${text.length.toLocaleString()} 文字`;
         }
 
-        // テキストを14ページ（2P〜14Pの13ページ分＋1P表紙）に自動分割
-        function autoDistributeText() {
+        // =====================================================================
+        // 「=== 【P.1】 タイトル ===」形式を自動認識してページごとにピタッと配置する関数
+        // =====================================================================
+        function parseAndApplyReadingText() {
             const raw = document.getElementById('bulk-input').value.trim();
             if (!raw) {
-                showToast('分割するテキストを入力してください');
+                showToast('貼り付け欄に鑑定文を入力してください');
                 return;
             }
 
-            // 段落単位で分割し、13ページ分（2P〜14P）に均等配分
-            const paragraphs = raw.split(/\n+/).filter(p => p.trim().length > 0);
-            const targetPagesCount = 13; // 2ページ目〜14ページ目
-            const totalChars = paragraphs.reduce((acc, p) => acc + p.length, 0);
-            const idealCharsPerPage = Math.ceil(totalChars / targetPagesCount);
-
-            let currentIdx = 1; // 0は表紙
-            let currentBuffer = [];
-            let currentLen = 0;
-
-            for (let i = 1; i < 14; i++) {
-                pagesData[i].body = "";
+            // いったん全ページをリセット
+            for (let i = 0; i < pagesData.length; i++) {
+                pagesData[i].body = '';
+                pagesData[i].hasContent = false;
             }
 
-            paragraphs.forEach(p => {
-                if (currentLen + p.length > idealCharsPerPage && currentIdx < 13 && currentBuffer.length > 0) {
-                    pagesData[currentIdx].body = currentBuffer.join('\n\n');
-                    currentIdx++;
-                    currentBuffer = [p];
-                    currentLen = p.length;
-                } else {
-                    currentBuffer.push(p);
-                    currentLen += p.length;
+            // 「=== 【P.1】 タイトル ===」や「【P.1】 タイトル」などの行を検出する正規表現
+            const headerRegex = /^(?:=+\s*)?【\s*P\.?\s*(\d+)\s*】\s*(.*?)(?:\s*=+)?$/gm;
+            const matches = [...raw.matchAll(headerRegex)];
+
+            if (matches.length > 0) {
+                // P.X マーカーが見つかった場合：指定されたページ番号（1〜16）へ正確に流し込む
+                for (let i = 0; i < matches.length; i++) {
+                    const match = matches[i];
+                    const pageNum = parseInt(match[1], 10);
+                    const rawHeading = match[2].trim();
+                    const startIndex = match.index + match[0].length;
+                    const endIndex = (i + 1 < matches.length) ? matches[i + 1].index : raw.length;
+                    const sectionBody = raw.slice(startIndex, endIndex).trim();
+
+                    if (pageNum >= 1 && pageNum <= pagesData.length) {
+                        const idx = pageNum - 1;
+                        // 見出しに「（サブタイトル）」が含まれていれば綺麗に分離
+                        const subMatch = rawHeading.match(/^(.*?)[（(]([^）)]+)[）)]$/);
+                        if (subMatch) {
+                            pagesData[idx].title = subMatch[1].trim();
+                            pagesData[idx].subtitle = subMatch[2].trim();
+                        } else if (rawHeading) {
+                            pagesData[idx].title = rawHeading;
+                            pagesData[idx].subtitle = '';
+                        }
+                        pagesData[idx].body = sectionBody;
+                        pagesData[idx].hasContent = sectionBody.length > 0 || rawHeading.length > 0;
+                    }
                 }
-            });
 
-            if (currentBuffer.length > 0 && currentIdx < 14) {
-                pagesData[currentIdx].body = currentBuffer.join('\n\n');
+                // 本文中から「〇〇様」を自動検出してお客様名に反映（任意サポート）
+                const clientMatch = raw.match(/([一-龠ぁ-んァ-ヶーa-zA-Z0-9\s]{1,12})様の星の地図/);
+                if (clientMatch && clientMatch[1]) {
+                    const detectedName = clientMatch[1].trim() + ' 様';
+                    metaData.client = detectedName;
+                    document.getElementById('meta-client').value = detectedName;
+                }
+
+                initPageSelector();
+                renderSinglePageEditor();
+                renderAllPages();
+                showToast(`${matches.length}ページ分の見出しと本文をズレなく反映しました！`);
+            } else {
+                // P.X マーカーがない通常の長文の場合：段落単位で14ページに均等分割
+                const paragraphs = raw.split(/\n+/).filter(p => p.trim().length > 0);
+                const targetPagesCount = 13;
+                const totalChars = paragraphs.reduce((acc, p) => acc + p.length, 0);
+                const idealCharsPerPage = Math.ceil(totalChars / targetPagesCount);
+
+                let currentIdx = 1;
+                let currentBuffer = [];
+                let currentLen = 0;
+
+                paragraphs.forEach(p => {
+                    if (currentLen + p.length > idealCharsPerPage && currentIdx < 13 && currentBuffer.length > 0) {
+                        pagesData[currentIdx].body = currentBuffer.join('\n\n');
+                        pagesData[currentIdx].hasContent = true;
+                        currentIdx++;
+                        currentBuffer = [p];
+                        currentLen = p.length;
+                    } else {
+                        currentBuffer.push(p);
+                        currentLen += p.length;
+                    }
+                });
+
+                if (currentBuffer.length > 0 && currentIdx < 14) {
+                    pagesData[currentIdx].body = currentBuffer.join('\n\n');
+                    pagesData[currentIdx].hasContent = true;
+                }
+                pagesData[0].hasContent = true;
+
+                initPageSelector();
+                renderSinglePageEditor();
+                renderAllPages();
+                showToast('鑑定文をページごとに分割して反映しました');
             }
-
-            renderSinglePageEditor();
-            renderAllPages();
-            showToast('テキストを14ページ構成に自動分割しました');
         }
 
-        // 個別ページ編集欄の描画
+        // PDF保存・印刷ダイアログ起動
+        function printToPdf() {
+            showToast('印刷画面が開いたら「送信先：PDFに保存」「背景のグラフィック：オン」を選んでください');
+            setTimeout(() => {
+                window.print();
+            }, 350);
+        }
+
+        // ページ別エディタの描画
         function renderSinglePageEditor() {
-            const idx = parseInt(document.getElementById('page-selector').value || '0', 10);
-            const page = pagesData[idx];
-            document.getElementById('single-page-title').value = page.title;
-            document.getElementById('single-page-subtitle').value = page.subtitle;
-            document.getElementById('single-page-body').value = page.body;
-            document.getElementById('single-page-chars').textContent = `${page.body.length} 文字`;
+            const idx = parseInt(document.getElementById('page-selector').value || 0, 10);
+            const p = pagesData[idx];
+            if (!p) return;
+            document.getElementById('edit-page-title').value = p.title;
+            document.getElementById('edit-page-subtitle').value = p.subtitle;
+            document.getElementById('edit-page-body').value = p.body;
+            document.getElementById('single-page-chars').textContent = `${p.body.length} 文字`;
         }
 
-        // 個別ページ編集の保存と即時反映
+        // ページ別エディタからの保存
         function saveSinglePageEdit() {
-            const idx = parseInt(document.getElementById('page-selector').value || '0', 10);
-            pagesData[idx].title = document.getElementById('single-page-title').value;
-            pagesData[idx].subtitle = document.getElementById('single-page-subtitle').value;
-            pagesData[idx].body = document.getElementById('single-page-body').value;
+            const idx = parseInt(document.getElementById('page-selector').value || 0, 10);
+            if (!pagesData[idx]) return;
+            pagesData[idx].title = document.getElementById('edit-page-title').value;
+            pagesData[idx].subtitle = document.getElementById('edit-page-subtitle').value;
+            pagesData[idx].body = document.getElementById('edit-page-body').value;
+            pagesData[idx].hasContent = pagesData[idx].body.trim().length > 0;
             document.getElementById('single-page-chars').textContent = `${pagesData[idx].body.length} 文字`;
-
-            // セレクトボックスのラベルも更新
-            const opt = document.getElementById('page-selector').options[idx];
-            if (opt) opt.textContent = `${pagesData[idx].pageNumber}ページ目：${pagesData[idx].title}`;
-
             renderAllPages();
         }
 
-        // メタ情報入力欄から状態更新
+        // メタデータ入力フォームから状態更新
         function updateStateFromInputs() {
             metaData.title = document.getElementById('meta-title').value;
             metaData.subtitle = document.getElementById('meta-subtitle').value;
             metaData.client = document.getElementById('meta-client').value;
             metaData.date = document.getElementById('meta-date').value;
-            metaData.neroliAroma = document.getElementById('neroli-aroma').value;
-            metaData.ihaneSongTitle = document.getElementById('ihane-song-title').value;
-            metaData.ihaneSongStyle = document.getElementById('ihane-song-style').value;
-            metaData.ihaneLyrics = document.getElementById('ihane-lyrics').value;
-            metaData.harukaTagline = document.getElementById('haruka-tagline').value;
-
-            if (currentBrand === 'ihane') {
-                pagesData[12].subtitle = `Theme Song: ${metaData.ihaneSongTitle}`;
-            }
+            metaData.neroliAroma = document.getElementById('meta-neroli-aroma').value;
+            metaData.ihaneSongTitle = document.getElementById('meta-ihane-song-title').value;
+            metaData.ihaneSongStyle = document.getElementById('meta-ihane-song-style').value;
+            metaData.ihaneLyrics = document.getElementById('meta-ihane-lyrics').value;
+            metaData.harukaTagline = document.getElementById('meta-haruka-tagline').value;
             renderAllPages();
         }
 
+        // ズーム変更
+        function changeZoom(delta) {
+            currentZoom = Math.min(1.2, Math.max(0.4, Math.round((currentZoom + delta) * 10) / 10));
+            document.getElementById('pages-container').style.transform = `scale(${currentZoom})`;
+            document.getElementById('zoom-label').textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+
         // =====================================================================
-        // 中身クリア機能（モーダル確認＆リセット実行）
+        // 中身クリア機能
         // =====================================================================
         function openClearModal() {
-            const m = document.getElementById('clear-modal');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            document.getElementById('clear-modal').classList.remove('hidden');
+            document.getElementById('clear-modal').classList.add('flex');
         }
 
         function closeClearModal() {
-            const m = document.getElementById('clear-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
+            document.getElementById('clear-modal').classList.add('hidden');
+            document.getElementById('clear-modal').classList.remove('flex');
         }
 
         function executeClearAll() {
             document.getElementById('bulk-input').value = '';
             document.getElementById('total-char-count').textContent = '0 文字';
 
-            for (let i = 0; i < 14; i++) {
+            for (let i = 0; i < pagesData.length; i++) {
                 pagesData[i].body = '';
+                pagesData[i].hasContent = false;
             }
 
             // タロット入力欄・画像もリセット
@@ -749,7 +852,7 @@
         }
 
         // =====================================================================
-        // Canva貼り付け用：ページ単位ワンクリックコピー機能
+        // Canva貼り付け用：1ページごとのワンクリックコピー機能
         // =====================================================================
         function copyTextSafe(text, successMsg) {
             const textarea = document.createElement('textarea');
@@ -769,42 +872,27 @@
 
         function copyPageToClipboard(pageIndex) {
             const page = pagesData[pageIndex];
-            let formattedText = '';
+            let copyContent = '';
 
             if (pageIndex === 0) {
-                // 表紙用テキスト
-                const brandHeader = currentBrand === 'neroli'
-                    ? 'ネロリの小部屋 〜アロマと占いの部屋〜'
-                    : currentBrand === 'ihane'
-                        ? 'イハネ 〜占星術と音楽〜'
-                        : 'AI専属占い師ハルカ 〜AIとの関係と恋愛について〜';
-
-                formattedText = `【${brandHeader}】\n${metaData.title}\n${metaData.subtitle}\n\n${metaData.client}\n鑑定日：${metaData.date}`;
-                if (currentBrand === 'neroli') {
-                    formattedText += `\nお守りブレンド精油：${metaData.neroliAroma}`;
-                } else if (currentBrand === 'ihane') {
-                    formattedText += `\nテーマ楽曲：${metaData.ihaneSongTitle}`;
-                } else if (currentBrand === 'haruka') {
-                    formattedText += `\n${metaData.harukaTagline}`;
-                }
+                copyContent = `【${metaData.title}】\n${metaData.subtitle}\n対象：${metaData.client} / 鑑定日：${metaData.date}\n\n${page.title}\n\n${page.body}`;
             } else if (currentBrand === 'ihane' && pageIndex === 12) {
-                // イハネ13ページ目（楽曲＆歌詞）
-                formattedText = `${page.title}\n楽曲タイトル：${metaData.ihaneSongTitle}\nサウンドイメージ：${metaData.ihaneSongStyle}\n\n【歌詞】\n${metaData.ihaneLyrics}\n\n【音と星の解説】\n${page.body}`;
+                copyContent = `${page.title}\n\n■ テーマ楽曲：${metaData.ihaneSongTitle}\n■ 音色イメージ：${metaData.ihaneSongStyle}\n\n【歌詞 / LYRICS】\n${metaData.ihaneLyrics}\n\n${page.body}`;
             } else {
-                // 通常の鑑定ページ（2P〜14P）
-                formattedText = `${page.title}\n${page.subtitle}\n\n${page.body}`;
+                copyContent = `${page.title}${page.subtitle ? `\n${page.subtitle}` : ''}\n\n${page.body}`;
             }
 
-            copyTextSafe(formattedText.trim(), `${page.pageNumber}ページ目をCanva用にコピーしました！`);
+            copyTextSafe(copyContent, `P.${pageIndex + 1} の内容をコピーしました！（Canvaにそのまま貼り付けできます）`);
         }
 
         // =====================================================================
-        // 全14ページのHTMLレンダリングエンジン（A4下端まで美しく収まる設計）
+        // 全ページのHTMLレンダリングエンジン（A4・1ページ完結＆PDF/Canva両対応）
         // =====================================================================
         function renderAllPages() {
             const container = document.getElementById('pages-container');
             container.innerHTML = '';
 
+            const hideEmpty = document.getElementById('hide-empty-pages')?.checked ?? false;
             const brandClass = `theme-${currentBrand}`;
             const brandNameLabel = currentBrand === 'neroli'
                 ? 'ネロリの小部屋 〜アロマと占いの部屋〜'
@@ -812,143 +900,173 @@
                     ? 'イハネ 〜占星術と音楽〜'
                     : 'AI専属占い師ハルカ 〜AIとの関係と恋愛について〜';
 
-            pagesData.forEach((page, index) => {
-                const pageEl = document.createElement('div');
-                pageEl.className = `pdf-page ${brandClass} font-mincho p-[14mm]`;
+            // 表示対象ページを抽出（空白ページ非表示がオンの場合は中身があるページだけ表示し、連番を振る）
+            const activePages = pagesData.filter((p, idx) => {
+                if (!hideEmpty) return true;
+                if (idx === 0) return true; // 表紙は常に表示
+                if (currentBrand === 'ihane' && idx === 12) return true; // イハネの歌詞ページは常に表示
+                return p.hasContent || (p.body && p.body.trim().length > 0);
+            });
 
-                // 各ページ右上に配置するCanva用ワンクリックコピーボタン
+            const totalVisiblePages = activePages.length;
+
+            activePages.forEach((page, visibleIndex) => {
+                const originalIndex = page.pageNumber - 1;
+                const displayPageNum = visibleIndex + 1;
+
+                const pageEl = document.createElement('div');
+                pageEl.className = `pdf-page ${brandClass} font-mincho p-[13mm]`;
+
+                // 各ページ右上に配置するCanva用ワンクリックコピーボタン（印刷時はno-printで非表示）
                 const copyBtnHtml = `
-                    <button onclick="copyPageToClipboard(${index})" title="このページの文章をCanva用にコピー"
-                        class="absolute top-3 right-3 z-20 px-3 py-1.5 rounded-full text-[11px] font-sans font-bold shadow-md flex items-center gap-1.5 transition cursor-pointer
+                    <button onclick="copyPageToClipboard(${originalIndex})" title="このページの文章をCanva用にコピー"
+                        class="no-print absolute top-3 right-3 z-20 px-3 py-1.5 rounded-full text-[11px] font-sans font-bold shadow-md flex items-center gap-1.5 transition cursor-pointer
                         ${currentBrand === 'ihane'
                             ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
                             : 'bg-slate-900/90 hover:bg-indigo-600 text-white'}">
                         <i class="fa-regular fa-copy"></i>
-                        <span>${page.pageNumber}Pをコピー</span>
+                        <span>P.${page.pageNumber}をコピー</span>
                     </button>
                 `;
 
-                // 1ページ目：表紙デザイン
-                if (index === 0) {
-                    pageEl.innerHTML = `
-                        ${copyBtnHtml}
-                        <div class="page-frame w-full flex-1 p-10 flex flex-col justify-between items-center text-center relative">
-                            <div class="mt-6 space-y-2">
-                                <p class="text-xs tracking-[0.25em] uppercase font-cinzel accent-text">${brandNameLabel}</p>
-                                <div class="w-16 h-[1px] mx-auto border-t divider-line"></div>
-                            </div>
-
-                            <!-- 中央シンボル＆タイトル -->
-                            <div class="my-auto space-y-6 max-w-lg">
-                                <div class="w-24 h-24 mx-auto rounded-full border divider-line flex items-center justify-center accent-bg shadow-inner">
-                                    ${getBrandEmblemSVG(currentBrand)}
+                // 1ページ目（index === 0）：表紙＆プロローグデザイン
+                if (originalIndex === 0) {
+                    const hasPrologue = page.body && page.body.trim().length > 0;
+                    if (hasPrologue) {
+                        // プロローグ本文がある場合は、上品な表紙ヘッダー＋プロローグ本文を1ページに美しく収める
+                        pageEl.innerHTML = `
+                            ${copyBtnHtml}
+                            <div class="page-frame w-full flex-1 p-8 flex flex-col justify-between">
+                                <div class="text-center border-b divider-line pb-4 pr-16 pl-16">
+                                    <p class="text-[10px] tracking-[0.25em] uppercase font-cinzel accent-text mb-1">${brandNameLabel}</p>
+                                    <h1 class="text-2xl font-bold tracking-wider leading-snug">${escapeHtml(metaData.title)}</h1>
+                                    <p class="text-xs accent-text mt-1">${escapeHtml(page.title)} ─ ${escapeHtml(metaData.client)}</p>
                                 </div>
-                                <h1 class="text-3xl font-bold leading-relaxed tracking-wider">${escapeHtml(metaData.title)}</h1>
-                                <p class="text-sm opacity-85 leading-relaxed">${escapeHtml(metaData.subtitle)}</p>
 
-                                ${currentBrand === 'neroli' ? `
-                                    <div class="mt-6 inline-block px-5 py-2.5 rounded-full border accent-bg text-xs">
-                                        <span class="accent-text font-bold">🌿 お守りブレンド精油：</span>${escapeHtml(metaData.neroliAroma)}
-                                    </div>
-                                ` : ''}
-
-                                ${currentBrand === 'ihane' ? `
-                                    <div class="mt-6 inline-block px-5 py-2.5 rounded-full border accent-bg text-xs">
-                                        <span class="accent-text font-bold">🎵 テーマ楽曲：</span>${escapeHtml(metaData.ihaneSongTitle)}
-                                    </div>
-                                ` : ''}
-
-                                ${currentBrand === 'haruka' ? `
-                                    <div class="mt-6 inline-block px-5 py-2.5 rounded-2xl border accent-bg text-xs">
-                                        <span class="accent-text font-bold">💖 </span>${escapeHtml(metaData.harukaTagline)}
-                                    </div>
-                                ` : ''}
-                            </div>
-
-                            <!-- 宛名・日付 -->
-                            <div class="mb-6 space-y-3 w-full max-w-sm">
-                                <div class="border-b divider-line pb-2">
-                                    <p class="text-xl font-bold tracking-widest">${escapeHtml(metaData.client)}</p>
+                                <div class="flex-1 my-4 overflow-hidden flex flex-col justify-center">
+                                    <div class="reading-body">${escapeHtml(page.body)}</div>
                                 </div>
-                                <p class="text-xs opacity-75 tracking-widest">鑑定日：${escapeHtml(metaData.date)}</p>
+
+                                <div class="pt-3 border-t divider-line flex justify-between items-center text-[10px] opacity-70">
+                                    <span>${brandNameLabel}</span>
+                                    <span>- ${displayPageNum} / ${totalVisiblePages} -</span>
+                                    <span>鑑定日：${escapeHtml(metaData.date)}</span>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        // 装飾表紙のみの場合
+                        pageEl.innerHTML = `
+                            ${copyBtnHtml}
+                            <div class="page-frame w-full flex-1 p-10 flex flex-col justify-between items-center text-center relative">
+                                <div class="mt-6 space-y-2">
+                                    <p class="text-xs tracking-[0.25em] uppercase font-cinzel accent-text">${brandNameLabel}</p>
+                                    <div class="w-16 h-[1px] mx-auto border-t divider-line"></div>
+                                </div>
+
+                                <div class="my-auto space-y-6 max-w-lg">
+                                    <div class="w-24 h-24 mx-auto rounded-full border divider-line flex items-center justify-center accent-bg shadow-inner">
+                                        ${getBrandEmblemSVG(currentBrand)}
+                                    </div>
+                                    <h1 class="text-3xl font-bold leading-relaxed tracking-wider">${escapeHtml(metaData.title)}</h1>
+                                    <p class="text-sm opacity-85 leading-relaxed">${escapeHtml(metaData.subtitle)}</p>
+
+                                    ${currentBrand === 'neroli' ? `
+                                        <div class="mt-6 inline-block px-5 py-2.5 rounded-full border accent-bg text-xs">
+                                            <span class="accent-text font-bold">🌿 お守りブレンド精油：</span>${escapeHtml(metaData.neroliAroma)}
+                                        </div>
+                                    ` : ''}
+
+                                    ${currentBrand === 'ihane' ? `
+                                        <div class="mt-6 inline-block px-5 py-2.5 rounded-full border accent-bg text-xs">
+                                            <span class="accent-text font-bold">🎵 テーマ楽曲：</span>${escapeHtml(metaData.ihaneSongTitle)}
+                                        </div>
+                                    ` : ''}
+
+                                    ${currentBrand === 'haruka' ? `
+                                        <div class="mt-6 inline-block px-5 py-2.5 rounded-2xl border accent-bg text-xs">
+                                            <span class="accent-text font-bold">💖 </span>${escapeHtml(metaData.harukaTagline)}
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                <div class="mb-6 space-y-3 w-full max-w-sm">
+                                    <div class="border-b divider-line pb-2">
+                                        <p class="text-xl font-bold tracking-widest">${escapeHtml(metaData.client)}</p>
+                                    </div>
+                                    <p class="text-xs opacity-75 tracking-widest">鑑定日：${escapeHtml(metaData.date)}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
                 }
-                // イハネ専用：13ページ目（index === 12）を歌詞・楽曲特別ページにする
-                else if (currentBrand === 'ihane' && index === 12) {
+                // イハネ専用：13ページ目（originalIndex === 12）を歌詞・楽曲特別ページにする
+                else if (currentBrand === 'ihane' && originalIndex === 12) {
                     pageEl.innerHTML = `
                         ${copyBtnHtml}
                         <div class="page-frame w-full flex-1 p-8 flex flex-col justify-between">
-                            <!-- ヘッダー -->
                             <div class="border-b divider-line pb-3 flex justify-between items-end pr-24">
                                 <div>
                                     <p class="text-[10px] font-cinzel tracking-[0.2em] accent-text">ASTROLOGY & MUSIC SCORE</p>
                                     <h2 class="text-lg font-bold tracking-wide mt-0.5">${escapeHtml(page.title)}</h2>
                                 </div>
-                                <span class="text-xs accent-text font-cinzel">Page ${page.pageNumber} / 14</span>
+                                <span class="text-xs accent-text font-cinzel">Page ${displayPageNum} / ${totalVisiblePages}</span>
                             </div>
 
-                            <!-- 楽曲インフォメーション -->
                             <div class="my-3 p-4 rounded-xl border accent-bg space-y-1.5">
                                 <div class="flex items-center gap-2 text-amber-300 font-bold text-sm">
                                     <i class="fa-solid fa-music"></i>
                                     <span>${escapeHtml(metaData.ihaneSongTitle)}</span>
                                 </div>
                                 <p class="text-xs text-slate-300">音色・アレンジイメージ：${escapeHtml(metaData.ihaneSongStyle)}</p>
-                                <!-- 五線譜モチーフ装飾 -->
                                 <div class="pt-1.5 opacity-40">
-                                    <div class="border-t border-amber-300/60 my-1"></div>
                                     <div class="border-t border-amber-300/60 my-1"></div>
                                     <div class="border-t border-amber-300/60 my-1"></div>
                                     <div class="border-t border-amber-300/60 my-1"></div>
                                 </div>
                             </div>
 
-                            <!-- 歌詞エリア -->
                             <div class="flex-1 flex flex-col justify-center px-6 py-3 border-l-2 border-amber-400/50 my-2 bg-white/[0.02] rounded-r-xl">
                                 <p class="text-[10px] tracking-[0.25em] text-amber-300/80 mb-2 font-cinzel">LYRICS / あなたに贈る詩</p>
-                                <div class="text-sm leading-[2.0] tracking-wider whitespace-pre-wrap text-amber-50">${escapeHtml(metaData.ihaneLyrics)}</div>
+                                <div class="text-sm leading-[1.95] tracking-wider whitespace-pre-wrap text-amber-50">${escapeHtml(metaData.ihaneLyrics)}</div>
                             </div>
 
-                            <!-- 補足リーディング -->
                             <div class="mt-2 pt-2 border-t divider-line">
                                 <p class="text-xs leading-relaxed opacity-90 whitespace-pre-wrap">${escapeHtml(page.body || 'この楽曲は、あなたのホロスコープが奏でる固有の周波数をイメージして紡がれました。')}</p>
                             </div>
 
-                            <!-- フッター -->
                             <div class="pt-3 mt-2 border-t divider-line flex justify-between items-center text-[10px] opacity-65">
                                 <span>${brandNameLabel}</span>
-                                <span>- ${page.pageNumber} -</span>
+                                <span>- ${displayPageNum} / ${totalVisiblePages} -</span>
                                 <span>${escapeHtml(metaData.client)}</span>
                             </div>
                         </div>
                     `;
                 }
-                // 通常の鑑定本文ページ（A4下端まで美しく収まる設計）
+                // 通常の鑑定本文ページ（1ページ1章完結・A4下端まで美しく収まる設計）
                 else {
                     pageEl.innerHTML = `
                         ${copyBtnHtml}
-                        <div class="page-frame w-full flex-1 p-9 flex flex-col justify-between">
+                        <div class="page-frame w-full flex-1 p-8 flex flex-col justify-between">
                             <!-- ページヘッダー -->
-                            <div class="border-b divider-line pb-3 mb-4 pr-24">
+                            <div class="border-b divider-line pb-3 mb-3.5 pr-24">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[10px] font-cinzel tracking-[0.2em] accent-text uppercase">CHAPTER ${String(index).padStart(2, '0')}</span>
+                                    <span class="text-[10px] font-cinzel tracking-[0.2em] accent-text uppercase">PAGE ${String(page.pageNumber).padStart(2, '0')}</span>
                                     <span class="text-[10px] opacity-60">${brandNameLabel}</span>
                                 </div>
-                                <h2 class="text-lg font-bold tracking-wide leading-snug">${escapeHtml(page.title)}</h2>
-                                <p class="text-xs accent-text mt-1">${escapeHtml(page.subtitle)}</p>
+                                <h2 class="text-[17px] font-bold tracking-wide leading-snug">${escapeHtml(page.title)}</h2>
+                                ${page.subtitle ? `<p class="text-xs accent-text mt-1">${escapeHtml(page.subtitle)}</p>` : ''}
                             </div>
 
-                            <!-- 本文エリア（約950〜1,050文字がA4下端まで綺麗に収まる設計） -->
+                            <!-- 本文エリア -->
                             <div class="flex-1 overflow-hidden">
-                                <div class="reading-body">${escapeHtml(page.body || '（ここに鑑定文が入ります。左側の「一括入力・分割」または「タロット画像AI」からテキストを作成できます）')}</div>
+                                <div class="reading-body">${escapeHtml(page.body || '（ここに鑑定文が入ります。左側の「鑑定文を貼り付け」からテキストを反映できます）')}</div>
                             </div>
 
                             <!-- ページフッター -->
-                            <div class="pt-3 mt-3 border-t divider-line flex justify-between items-center text-[10px] opacity-65">
+                            <div class="pt-2.5 mt-3 border-t divider-line flex justify-between items-center text-[10px] opacity-65">
                                 <span>${brandNameLabel}</span>
-                                <span>- ${page.pageNumber} -</span>
+                                <span>- ${displayPageNum} / ${totalVisiblePages} -</span>
                                 <span>${escapeHtml(metaData.client)}</span>
                             </div>
                         </div>
@@ -959,107 +1077,195 @@
             });
         }
 
-        // ブランドごとのSVGエンブレム
+        // ブランド別SVGエンブレム
         function getBrandEmblemSVG(brand) {
             if (brand === 'neroli') {
-                return `<svg class="w-12 h-12 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-                    <path d="M12 22C12 16 7 12 2 12C2 17 6 22 12 22Z" />
-                    <path d="M12 22C12 16 17 12 22 12C22 17 18 22 12 22Z" />
-                    <path d="M12 22V7" />
-                    <circle cx="12" cy="5" r="2.5" />
+                return `<svg class="w-12 h-12 text-[#5b7548]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                    <path d="M12 22V12M12 12C12 7 16 4 21 4C21 9 18 12 12 12ZM12 15C12 11 8 8 3 8C3 13 6 15 12 15Z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
                 </svg>`;
             } else if (brand === 'ihane') {
-                return `<svg class="w-12 h-12 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-                    <circle cx="12" cy="12" r="9" stroke-dasharray="2 2"/>
-                    <path d="M9 17V7l8-2v10" />
-                    <circle cx="7" cy="17" r="2" />
-                    <circle cx="15" cy="15" r="2" />
+                return `<svg class="w-12 h-12 text-[#e6c67c]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                    <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+                    <path d="M12 2l.5 1.5L14 4l-1.5.5L12 6l-.5-1.5L10 4l1.5-.5L12 2z" fill="currentColor"/>
                 </svg>`;
             } else {
-                return `<svg class="w-12 h-12 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                return `<svg class="w-12 h-12 text-[#c85a87]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    <path d="M12 7v4m-2-2h4" stroke-linecap="round"/>
+                    <path d="M12 7l.7 2.1L15 9.8l-2.3.7L12 12.6l-.7-2.1L9 9.8l2.3-.7L12 7z" fill="currentColor"/>
                 </svg>`;
             }
         }
 
         // =====================================================================
-        // タロット画像読み込み＆3ブランド別AIリーディング機能
+        // タロット画像アップロード＆Gemini APIリーディング機能
         // =====================================================================
         function handleTarotImageUpload(event) {
-            const file = event.target.files?.[0];
+            const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const dataUrl = e.target.result;
-                const [header, base64] = dataUrl.split(',');
-                const mimeMatch = header.match(/data:(.*?);base64/);
-
-                tarotImageBase64 = base64;
-                tarotImageMimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-
-                const previewImg = document.getElementById('tarot-preview-img');
-                previewImg.src = dataUrl;
-                previewImg.classList.remove('hidden');
-                document.getElementById('tarot-upload-placeholder').classList.add('hidden');
-                document.getElementById('tarot-img-actions').classList.remove('hidden');
-                showToast('タロット画像を読み込みました');
+                const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
+                if (matches) {
+                    tarotImageMimeType = matches[1];
+                    tarotImageBase64 = matches[2];
+                    document.getElementById('tarot-image-preview').src = dataUrl;
+                    document.getElementById('tarot-upload-placeholder').classList.add('hidden');
+                    document.getElementById('tarot-preview-wrapper').classList.remove('hidden');
+                    showToast('タロット画像を読み込みました');
+                }
             };
             reader.readAsDataURL(file);
         }
 
-        function clearTarotImage() {
+        function clearTarotImage(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             tarotImageBase64 = null;
             tarotImageMimeType = null;
-            document.getElementById('tarot-image-input').value = '';
-            const previewImg = document.getElementById('tarot-preview-img');
-            previewImg.src = '';
-            previewImg.classList.add('hidden');
+            const input = document.getElementById('tarot-image-input');
+            if (input) input.value = '';
+            document.getElementById('tarot-image-preview').src = '';
             document.getElementById('tarot-upload-placeholder').classList.remove('hidden');
-            document.getElementById('tarot-img-actions').classList.add('hidden');
+            document.getElementById('tarot-preview-wrapper').classList.add('hidden');
         }
 
-        function updateTarotResultCount() {
-            const text = document.getElementById('tarot-result-output').value;
-            document.getElementById('tarot-result-chars').textContent = `${text.length} 文字`;
-        }
-
-        async function generateTarotReading() {
-            const contextText = document.getElementById('tarot-context-input').value.trim();
-
-            if (!tarotImageBase64 && !contextText) {
-                showToast('タロット画像をアップロードするか、占いの内容を入力してください');
+        async function generateTarotReadingWithGemini() {
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                openApiModal();
+                showToast('先にGemini APIキーを設定してください');
                 return;
             }
 
-            // 3ブランドごとのペルソナ・世界観プロンプト
+            const contextText = document.getElementById('tarot-context-input').value.trim();
+            if (!tarotImageBase64 && !contextText) {
+                showToast('タロット画像または占いの内容を入力してください');
+                return;
+            }
+
             const personaGuides = {
-                neroli: `あなたは「ネロリの小部屋（アロマと占いの部屋）」の優しいセラピスト兼タロットリーダーです。
-・口調：穏やかで包容力のある丁寧な「です・ます」調。植物や光、香りの比喩を交えて癒やしを届けてください。
-・構成：読み取ったタロットカードの象徴と意味を丁寧に紐解き、最後に今の相談者の心を整える「おすすめの香り（精油）のワンポイント」を添えてください。`,
-                ihane: `あなたは「イハネ（占星術と音楽）」の繊細で詩的なタロットリーダーです。
-・口調：静かな夜空や旋律を思わせる上品で美しい「です・ます」調。カードの象徴を「音色・リズム・和音」に例えて表現してください。
-・構成：読み取ったタロットカードが奏でるメッセージを深く読み解き、心のチューニングを整えるアドバイスを届けてください。`,
-                haruka: `あなたは「AI専属占い師ハルカ（AIとの関係と恋愛について）」の親しみやすく寄り添う現代の占い師です。
-・口調：温かく親近感のある「〜だよ」「〜だね」「〜かな？」といった優しい会話調（敬語すぎず、愛と共感に満ちたトーン）。
-・構成：恋愛や人間関係、心の揺れに寄り添いながらタロットカードのメッセージを読み解き、前向きに一歩踏み出せるエールを贈ってください。`
+                neroli: 'あなたは「ネロリの小部屋（アロマと占いの部屋）」のセラピストです。温かく包み込むような丁寧な口調で、タロットカードの象徴と、心を癒やすおすすめのアロマ精油（ネロリ、ラベンダー、ベルガモット等）のアドバイスを添えて鑑定してください。',
+                ihane: 'あなたは「イハネ（占星術と音楽）」の案内人です。詩的で神秘的な美しい日本語で、タロットカードの絵柄から聴こえてくる「魂の旋律やリズム」に例えながら、深い洞察を紡いでください。',
+                haruka: 'あなたは「AI専属占い師ハルカ（AIとの関係と恋愛について）」です。親しみやすく寄り添う優しい口調（「〜だね」「〜だよ♡」など上品な親近感）で、相談者の恋心やAI・大切な人との絆に光を当てるタロット鑑定を行ってください。'
             };
 
-            const systemInstruction = `${personaGuides[currentBrand]}\n\n【構成ルール】\n・鑑定書（Canva）のA4サイズ1ページの下端までしっかり埋まるボリューム（約950〜1,050文字）で作成してください。\n・画像が添付されている場合は、写っているすべてのタロットカードの名称、正位置・逆位置、絵柄の印象を正確に読み取って解説に組み込んでください。`;
+            const systemInstruction = `${personaGuides[currentBrand]}
 
-            const userPrompt = contextText
-                ? `以下の相談テーマ・スプレッド情報と、添付のタロットカード画像をもとに、鑑定書に載せるタロットリーディング結果（約950〜1,050文字）を作成してください。\n\n【占いの内容・相談テーマ】\n${contextText}`
-                : `添付されたタロットカード画像から、出ているカードと正逆位置を読み取り、今の相談者へ向けた深いメッセージ（約950〜1,050文字）を作成してください。`;
+【構成ルール（ケルト十字スプレッド・2ページ構成）】
+・鑑定書（PDF・Canva）のA4サイズ2ページ分（P.15とP.16）に美しく収まるよう、必ず以下の区切り見出しを使って2パートに分けて出力してください。
+・1ページ目（P.15）は約850〜950文字、2ページ目（P.16）も約850〜950文字のボリュームに整えてください。
+・画像が添付されている場合は、ケルト十字の10枚のカードの名称、正位置・逆位置、絵柄の印象を丁寧に読み取って解説に組み込んでください。
 
-            showLoading('Gemini AIがタロットカードを読み解いています...');
+【出力フォーマット（必ずこの見出しを含めること）】
+=== 【P.15】 タイトル ===
+（1枚目：現状、2枚目：障害/鍵、3枚目：顕在意識、4枚目：潜在意識、5枚目：過去、6枚目：近未来のリーディング）
+
+=== 【P.16】 タイトル ===
+（7枚目：本人の立場、8枚目：周囲の環境、9枚目：願望と恐れ、10枚目：最終結果と総合お守りメッセージ）`;
+
+            const userPrompt = `【お客様名】${metaData.client}
+【占いの内容・相談テーマ】${contextText || '現在の状況と今後の展開（ケルト十字スプレッド）'}
+
+上記の情報${tarotImageBase64 ? 'と添付されたタロットカードの写真' : ''}をもとに、ブランドの世界観たっぷりのケルト十字タロット鑑定結果（P.15・P.16の2ページ分）を作成してください。`;
+        function applyTarotToPages15And16() {
+            const text = document.getElementById('tarot-result-output').value.trim();
+            if (!text) {
+                showToast('反映するタロット鑑定結果がありません');
+                return;
+            }
+
+            // ブランド別のデフォルト見出し設定
+            const defaultTitles = currentBrand === 'haruka'
+                ? [
+                    { title: '特別付録：ハルカのケルト十字リーディング ①', sub: '現状・心の奥の本音・近未来への流れ（1〜6枚目）' },
+                    { title: '特別付録：ハルカのケルト十字リーディング ②', sub: '周囲の環境・最終結果と恋のお守りメッセージ（7〜10枚目）' }
+                ]
+                : currentBrand === 'ihane'
+                    ? [
+                        { title: '特別付録：ケルト十字が奏でる魂の旋律 ①', sub: '現状・深層意識・過去から近未来へのリズム（1〜6枚目）' },
+                        { title: '特別付録：ケルト十字が奏でる魂の旋律 ②', sub: '周囲の響き・最終結果と未来へのエール（7〜10枚目）' }
+                    ]
+                    : [
+                        { title: '特別付録：ネロリのケルト十字タロット鑑定 ①', sub: '現状・深層心理・過去から近未来への流れ（1〜6枚目）' },
+                        { title: '特別付録：ネロリのケルト十字タロット鑑定 ②', sub: '周囲の環境・最終結果と香りのお守り処方（7〜10枚目）' }
+                    ];
+
+            // 【P.15】と【P.16】の区切りがあれば分離、なければ半分付近の段落で綺麗に2分割
+            const p15Match = text.match(/^(?:=+\s*)?【\s*P\.?\s*15\s*】\s*(.*?)(?:\s*=+)?$/m);
+            const p16Match = text.match(/^(?:=+\s*)?【\s*P\.?\s*16\s*】\s*(.*?)(?:\s*=+)?$/m);
+
+            if (p15Match && p16Match) {
+                const p15Start = p15Match.index + p15Match[0].length;
+                const p15Body = text.slice(p15Start, p16Match.index).trim();
+                const p16Start = p16Match.index + p16Match[0].length;
+                const p16Body = text.slice(p16Start).trim();
+
+                pagesData[14].title = p15Match[1].trim() || defaultTitles[0].title;
+                pagesData[14].subtitle = defaultTitles[0].sub;
+                pagesData[14].body = p15Body;
+                pagesData[14].hasContent = true;
+
+                pagesData[15].title = p16Match[1].trim() || defaultTitles[1].title;
+                pagesData[15].subtitle = defaultTitles[1].sub;
+                pagesData[15].body = p16Body;
+                pagesData[15].hasContent = true;
+            } else {
+                // 手動入力やマーカーなしの場合は段落単位で前半（15P）・後半（16P）に均等分割
+                const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0);
+                const halfLen = Math.ceil(text.length / 2);
+                let part1 = [];
+                let part2 = [];
+                let acc = 0;
+                paragraphs.forEach(p => {
+                    if (acc < halfLen) {
+                        part1.push(p);
+                        acc += p.length;
+                    } else {
+                        part2.push(p);
+                    }
+                });
+
+                pagesData[14].title = defaultTitles[0].title;
+                pagesData[14].subtitle = defaultTitles[0].sub;
+                pagesData[14].body = part1.join('\n\n');
+                pagesData[14].hasContent = true;
+
+                pagesData[15].title = defaultTitles[1].title;
+                pagesData[15].subtitle = defaultTitles[1].sub;
+                pagesData[15].body = part2.join('\n\n');
+                pagesData[15].hasContent = true;
+            }
+
+            initPageSelector();
+            renderAllPages();
+            showToast('P.15・P.16の2ページにケルト十字タロット鑑定を反映しました！');
+        }
+
+            showLoading('タロット画像とテーマを読み込んで鑑定中...');
             try {
-                const output = await callGeminiVisionAPI(userPrompt, systemInstruction, tarotImageBase64, tarotImageMimeType);
-                document.getElementById('tarot-result-output').value = output.trim();
-                updateTarotResultCount();
-                showToast('タロット鑑定文を生成しました！');
-            } catch (e) {
-                showToast(e.message);
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemInstruction }] },
+                        contents: [{ parts: parts }]
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error?.message || 'APIエラーが発生しました');
+
+                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                document.getElementById('tarot-result-output').value = resultText.trim();
+                document.getElementById('tarot-result-chars').textContent = `${resultText.trim().length} 文字`;
+                showToast('タロット鑑定結果の生成が完了しました！');
+            } catch (err) {
+                showToast(`エラー: ${err.message}`);
             } finally {
                 hideLoading();
             }
@@ -1068,10 +1274,10 @@
         function copyTarotResultOnly() {
             const text = document.getElementById('tarot-result-output').value.trim();
             if (!text) {
-                showToast('コピーするタロット鑑定結果がありません');
+                showToast('コピーするタロット結果がありません');
                 return;
             }
-            copyTextSafe(text, 'タロット鑑定結果をクリップボードにコピーしました！');
+            copyTextSafe(text, 'タロット鑑定結果をコピーしました！');
         }
 
         function applyTarotToPage14() {
@@ -1087,6 +1293,7 @@
                     : '最終章：ネロリのタロット＆香りのお守りメッセージ';
             pagesData[13].subtitle = 'カードが映し出す今のあなたへの特別な導き';
             pagesData[13].body = text;
+            pagesData[13].hasContent = true;
 
             initPageSelector();
             renderAllPages();
@@ -1094,194 +1301,139 @@
         }
 
         // =====================================================================
-        // Gemini API キー管理＆呼び出しロジック
+        // Gemini API 連携（イハネ用歌詞生成）
         // =====================================================================
-        function getSavedApiKey() {
-            return localStorage.getItem('gemini_astrology_api_key') || '';
-        }
-
-        function checkSavedApiKey() {
-            const key = getSavedApiKey();
-            const btnText = document.getElementById('api-status-text');
-            if (key) {
-                btnText.textContent = 'API連携中 ✓';
-                btnText.classList.add('text-emerald-300');
-            } else {
-                btnText.textContent = 'Gemini API設定';
-                btnText.classList.remove('text-emerald-300');
-            }
-        }
-
         function openApiModal() {
-            document.getElementById('gemini-api-key-input').value = getSavedApiKey();
-            const modal = document.getElementById('api-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            document.getElementById('api-modal').classList.remove('hidden');
+            document.getElementById('api-modal').classList.add('flex');
+            const saved = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('gemini-api-key-input').value = saved;
         }
 
         function closeApiModal() {
-            const modal = document.getElementById('api-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById('api-modal').classList.add('hidden');
+            document.getElementById('api-modal').classList.remove('flex');
         }
 
         function saveApiKey() {
-            const val = document.getElementById('gemini-api-key-input').value.trim();
-            localStorage.setItem('gemini_astrology_api_key', val);
-            checkSavedApiKey();
-            closeApiModal();
-            showToast(val ? 'Gemini APIキーを保存しました' : 'APIキーが空のまま保存されました');
+            const key = document.getElementById('gemini-api-key-input').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                checkSavedApiKey();
+                closeApiModal();
+                showToast('Gemini APIキーを保存しました');
+            }
         }
 
         function clearApiKey() {
-            localStorage.removeItem('gemini_astrology_api_key');
+            localStorage.removeItem('gemini_api_key');
             document.getElementById('gemini-api-key-input').value = '';
             checkSavedApiKey();
             showToast('APIキーを削除しました');
         }
 
-        async function callGeminiAPI(promptText, systemInstruction = "") {
-            const apiKey = getSavedApiKey();
-            if (!apiKey) {
-                openApiModal();
-                throw new Error('先に右上の「Gemini API設定」からAPIキーを入力してください');
+        function checkSavedApiKey() {
+            const key = localStorage.getItem('gemini_api_key');
+            const statusText = document.getElementById('api-status-text');
+            const statusBtn = document.getElementById('api-status-btn');
+            if (key) {
+                statusText.textContent = 'API連携済';
+                statusBtn.classList.add('border-emerald-500/60', 'text-emerald-300');
+            } else {
+                statusText.textContent = 'Gemini API設定';
+                statusBtn.classList.remove('border-emerald-500/60', 'text-emerald-300');
             }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-            const payload = {
-                contents: [{ parts: [{ text: promptText }] }]
-            };
-            if (systemInstruction) {
-                payload.systemInstruction = { parts: [{ text: systemInstruction }] };
-            }
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `APIエラー (${response.status})`);
-            }
-
-            const data = await response.json();
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         }
 
-        async function callGeminiVisionAPI(promptText, systemInstruction, base64Data, mimeType) {
-            const apiKey = getSavedApiKey();
+        async function generateLyricsWithGemini() {
+            const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
                 openApiModal();
-                throw new Error('先に右上の「Gemini API設定」からAPIキーを入力してください');
-            }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-            const parts = [{ text: promptText }];
-            if (base64Data && mimeType) {
-                parts.push({
-                    inlineData: {
-                        mimeType: mimeType,
-                        data: base64Data
-                    }
-                });
-            }
-
-            const payload = {
-                contents: [{ parts: parts }]
-            };
-            if (systemInstruction) {
-                payload.systemInstruction = { parts: [{ text: systemInstruction }] };
-            }
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `APIエラー (${response.status})`);
-            }
-
-            const data = await response.json();
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        }
-
-        // Gemini AIでブランド口調にリライト＆14P分割
-        async function aiFormatAndExpand() {
-            const rawText = document.getElementById('bulk-input').value.trim();
-            if (!rawText) {
-                showToast('先に鑑定テキストを入力してください');
+                showToast('先にGemini APIキーを設定してください');
                 return;
             }
 
-            const brandPersona = currentBrand === 'neroli'
-                ? '「ネロリの小部屋（アロマと占いの部屋）」の穏やかで癒やしに満ちたセラピスト口調（植物や香りの比喩を交えた優しい敬語）'
-                : currentBrand === 'ihane'
-                    ? '「イハネ（占星術と音楽）」の繊細で詩的な音楽家・星読み口調（音色や旋律、星々の響きに例えた上品な敬語）'
-                    : '「AI専属占い師ハルカ（AIとの関係と恋愛について）」の親しみやすく寄り添う会話調（恋愛や心の機微に温かく共感する優しいトーン）';
+            const sampleContext = pagesData.slice(0, 4).map(p => p.body).join('\n').slice(0, 1800);
+            showLoading('星の配置からテーマ楽曲と歌詞を作曲中...');
 
-            showLoading('Gemini AIがブランドの世界観に合わせて文章を調律しています...');
-            try {
-                const sys = `あなたはプロの占星術ライターです。入力された占星術・サビアンシンボルの鑑定テキストを、${brandPersona}にリライト・整形してください。A4用紙14ページ分の下端までしっかり読み応えのあるボリューム（全体で約12,000〜13,500文字規模、各章約950〜1,050文字）になるよう情景描写やアドバイスを豊かに膨らませ、段落ごとに読みやすく整えてください。`;
-                const output = await callGeminiAPI(rawText, sys);
-                document.getElementById('bulk-input').value = output;
-                updateBulkCharCount();
-                autoDistributeText();
-                showToast('AIによる調律と14ページ分割が完了しました！');
-            } catch (e) {
-                showToast(e.message);
-            } finally {
-                hideLoading();
-            }
-        }
+            const prompt = `あなたは「イハネ（占星術と音楽）」の作詞家です。
+以下の占星術鑑定の内容をもとに、相談者（${metaData.client}）の魂に寄り添うオリジナルイメージソングの「楽曲タイトル」「曲調イメージ」「歌詞（2番まで、A4ページに美しく収まる12〜16行程度）」を作成してください。
 
-        // イハネ専用：鑑定内容からイメージ楽曲の歌詞をAI生成
-        async function generateIhaneLyricsWithAI() {
-            const baseText = document.getElementById('bulk-input').value.trim() || pagesData[1].body;
-            showLoading('星の配置からイメージソングの歌詞を紡いでいます...');
+必ず以下のJSON形式のみで出力してください：
+{
+  "songTitle": "楽曲タイトル",
+  "songStyle": "曲調や楽器のイメージ",
+  "lyrics": "歌詞本文（改行を含む）"
+}
+
+【鑑定内容の抜粋】
+${sampleContext}`;
+
             try {
-                const sys = 'あなたは占星術と音楽を融合させる作詞家「イハネ」です。鑑定文のテーマから、心に響く美しい日本語の歌詞（2コーラス、16〜20行程度）を1曲分作成してください。余計な説明は省き、歌詞のみを出力してください。';
-                const lyrics = await callGeminiAPI(`以下の鑑定結果からイメージソングの歌詞を作ってください：\n\n${baseText.slice(0, 2000)}`, sys);
-                document.getElementById('ihane-lyrics').value = lyrics.trim();
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error?.message || 'APIエラー');
+
+                const resultJson = JSON.parse(data.candidates[0].content.parts[0].text);
+                document.getElementById('meta-ihane-song-title').value = resultJson.songTitle || metaData.ihaneSongTitle;
+                document.getElementById('meta-ihane-song-style').value = resultJson.songStyle || metaData.ihaneSongStyle;
+                document.getElementById('meta-ihane-lyrics').value = resultJson.lyrics || metaData.ihaneLyrics;
                 updateStateFromInputs();
-                showToast('オリジナル歌詞を生成しました！');
-            } catch (e) {
-                showToast(e.message);
+                showToast('オリジナル楽曲と歌詞を生成しました！');
+            } catch (err) {
+                showToast(`歌詞生成エラー: ${err.message}`);
             } finally {
                 hideLoading();
             }
         }
 
-        /* =====================================================================
-           サンプルデータ生成（A4下端まで埋まる約13,000文字規模のデモ体験用）
-           ===================================================================== */
+        // =====================================================================
+        // サンプルデータ生成（実際に送っていただいた形式のサンプルを初期表示）
+        // =====================================================================
         function loadSampleData(silent = false) {
-            const baseParagraph = `あなたの出生図に刻まれたサビアンシンボルは、まるで静かな夜明けの湖面に映る一筋の光のように、極めて純粋で力強い象徴を物語っています。この度数が示す情景は、単なる性格の傾向にとどまらず、あなたがこの人生という舞台でどのような物語を紡ぎ、周囲の人々にどんな温かな影響を与えていくのかという「魂の設計図」そのものです。\n\n特に注目すべきは、その情景の中に描かれた登場人物たちの佇まいです。一見すると静かで控えめな印象を与えるかもしれませんが、その内側には誰にも消すことのできない確かな情熱の炎と、物事の本質を見抜く深い洞察力が秘められています。これまであなたが「なぜ自分は周囲と少し違う視点を持ってしまうのだろう」と感じていた場面があったとしたら、それこそがまさにこのサビアンシンボルが授けてくれた特別な才能の証なのです。\n\nまた、対人関係やパートナーシップにおいても、この象徴は特別な輝きを放ちます。表面的な言葉のやり取りだけでなく、相手の心の奥にある言葉にならない想いを自然に受け止める感受性が備わっているため、あなたと時間を共にする人は深い安心感と癒やしを覚えるはずです。\n\n日常の中で迷いが生じたときは、ぜひこのシンボルの風景を心の中に思い浮かべてみてください。焦って答えを出そうとしなくても、あなたの内なる羅針盤はすでに正しい方角を指し示しています。自分自身の感覚を信じ、一歩ずつ丁寧に歩みを進めることで、本来の魅力が自然と花開き、必要なご縁やチャンスがまるで磁石に引き寄せられるように集まってくるでしょう。`;
+            const sampleText = `=== 【P.1】 表紙・プロローグ ===
 
-            // 1ページあたり約950文字になるように各ページに配置
-            for (let i = 1; i < 14; i++) {
-                pagesData[i].body = `【${pagesData[i].title}の深層リーディング】\n\n` + baseParagraph.trim();
-            }
+ネロリの小部屋（占いとアロマの部屋）へようこそ。
 
-            const fullText = pagesData.slice(1).map(p => p.body).join('\n\n');
-            document.getElementById('bulk-input').value = fullText;
-            document.getElementById('total-char-count').textContent = `${fullText.length.toLocaleString()} 文字`;
+扉を開けてくださって、ありがとうございます。オーナーセラピストのネロリです。ここは、日々の喧騒から少しだけ離れて、ご自身の、そして大切なお子様の「魂の音色」に耳を澄ませるための静かな場所です。
 
-            renderSinglePageEditor();
-            renderAllPages();
+今日は、サンプル様の星の地図をそっと広げてみました。この鑑定書は、単なる運勢の記録ではありません。サンプル様がこの地上に降り立った瞬間に、宇宙が贈った「約束の花束」のようなものです。そこには、どんなに時代が変わっても揺らぐことのない、サンプル様だけの美しさ、才能、そして優しさが刻まれています。
+
+毎日、お子様のそばでその成長を見守り、時には悩み、時には祈るような気持ちで過ごされているお母様。本当にお疲れ様です。お子様の繊細さや、周りと少し違う感性に戸惑うこともあるかもしれません。けれど、星たちが教えてくれるのは、「今のままのその子で、完璧なんだよ」という温かな真実です。
+
+今、このお部屋には、心を解きほぐす「ネロリ」の香りが漂っています。ビターオレンジの花から採れるこの香りは、不安を包み込み、深い安心感を与えてくれます。この鑑定書を読み進める間、どうかお母様も、深く深呼吸をしてみてください。
+
+=== 【P.2】 第1章：魂の本質と持って生まれた才能 ①（太陽と水星が示すあなたの光） ===
+
+サンプル様の人生のメインテーマを司る「太陽」は、水瓶座の2度に位置しています。サビアンシンボルは「海軍からの脱走兵」。この言葉を聞いて、少し驚かれるかもしれませんね。けれど、これは決してネガティブな意味ではありません。このシンボルが示しているのは、「自分自身の純粋な意志に従い、既存の枠組みから勇気を持って一歩踏み出す」という、気高く自由な精神です。
+
+サンプル様は、誰かに決められたルールや、集団の規律に無理に自分を当てはめることが、少し苦しく感じられるかもしれません。それは、魂が「もっと自由で、もっと自分らしい生き方」を知っているからです。社会の荒波に揉まれるよりも、自分自身の内側にある真実を大切にする。そんな、凛とした強さを持っています。
+
+そして、知性やコミュニケーションを司る「水星」は、山羊座の22度にあります。サビアンシンボルは「敗北を優美に認める将軍」。これは、目先の勝ち負けよりも、もっと大きな視点で物事を捉えることができる、非常に成熟した知性を表しています。たとえ思い通りにいかないことがあっても、それを糧にして、より洗練された自分へと成長していく。そんな「心の気品」が、サンプル様の言葉や考え方には宿っています。
+
+第2ハウスという「才能や価値観」の場所にこれらの星が集まっているため、サンプル様は自分独自の感性や、じっくりと積み上げた知識を、人生の確かな土台にしていける方です。
+
+この知性を健やかに育むために、レモンのような清涼感のある香りが味方をしてくれます。考えすぎて心が疲れてしまった時は、レモンの精油を数滴垂らしたお湯で手浴をしてみてください。霧が晴れるように思考がクリアになり、サンプル様らしい自由な発想が再び湧き上がってくるはずです。`;
+
+            document.getElementById('bulk-input').value = sampleText;
+            updateBulkCharCount();
+            parseAndApplyReadingText();
             if (!silent) {
-                showToast('A4下端まで収まる約13,000文字のサンプル鑑定データを読み込みました');
+                showToast('「=== 【P.1】 ===」形式のサンプルを読み込みました');
             }
         }
 
         // ユーティリティ関数
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str)
+            return str
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
@@ -1290,27 +1442,23 @@
         }
 
         function showLoading(msg) {
-            document.getElementById('loading-text').textContent = msg;
-            const el = document.getElementById('loading-overlay');
-            el.classList.remove('hidden');
-            el.classList.add('flex');
+            document.getElementById('loading-message').textContent = msg;
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            document.getElementById('loading-overlay').classList.add('flex');
         }
 
         function hideLoading() {
-            const el = document.getElementById('loading-overlay');
-            el.classList.add('hidden');
-            el.classList.remove('flex');
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('loading-overlay').classList.remove('flex');
         }
 
-        let toastTimer = null;
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = msg;
+            document.getElementById('toast-text').textContent = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
+            setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3200);
+            }, 3500);
         }
     </script>
 </body>
