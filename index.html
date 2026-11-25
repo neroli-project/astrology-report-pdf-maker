@@ -551,7 +551,64 @@
         let tarotImageBase64 = null;
         let tarotImageMimeType = null;
         const STORAGE_KEY = 'astrology_studio_autosave_v1';
+
+        let metaData = {
+            title: '星とサビアンが紡ぐ 魂の羅針盤',
+            subtitle: '〜 あなたの個性・才能・愛の軌跡 〜',
+            client: 'サンプル 様',
+            date: '2026年11月24日',
+            neroliAroma: 'ネロリ × ベルガモット × サンダルウッド',
+            ihaneSongTitle: '星屑のプレリュード（Prelude of Stardust）',
+            ihaneSongStyle: '夜明けのハープと静かなピアノ、432Hzの癒やしの旋律',
+            ihaneLyrics: '夜空に散らばる　小さな光の粒\nまだ名前のない　あなたの物語\nそっと耳を澄ませば　聴こえてくるメロディ\n迷いさえも　美しい和音に変わるから\n\n巡る星たちの　導くままに\nあなただけの音色を　奏でてゆこう',
+            harukaTagline: 'あなたの恋と心の波長、ハルカがいつでもそばで受け止めるね♡'
+        };
+
         // 16ページ分のデフォルト章構成（P.1〜P.14：占星術 / P.15〜P.16：ケルト十字タロット2ページ）
+        let pagesData = Array.from({ length: 16 }, (_, i) => {
+            const pageNumber = i + 1;
+            const defaultTitles = {
+                1: { title: '表紙・プロローグ', subtitle: 'あなたの星の地図を開く前に' },
+                2: { title: '第1章：魂の本質と持って生まれた才能 ①', subtitle: '太陽と水星が示すあなたの光' },
+                3: { title: '第1章：魂の本質と持って生まれた才能 ②', subtitle: '月と金星が示す心の安心感と魅力' },
+                4: { title: '第1章：魂の本質と持って生まれた才能 ③', subtitle: '火星と木星が広げる情熱と幸運の扉' },
+                5: { title: '第1章：魂の本質と持って生まれた才能 ④', subtitle: '土星・外惑星が授ける深い智慧と使命' },
+                6: { title: '第1章：魂の本質と持って生まれた才能 ⑤', subtitle: 'ドラゴンヘッド＆テイルが示す今世の物語' },
+                7: { title: '第1章：魂の本質と持って生まれた才能 ⑥', subtitle: '天体のアスペクトが織りなす才能のハーモニー' },
+                8: { title: '第2章：現在進行形の内面テーマ ①', subtitle: 'プログレスの太陽と月が照らす「今の心の季節」' },
+                9: { title: '第2章：現在進行形の内面テーマ ②', subtitle: 'これからの転機と魂の成長サイクル' },
+                10: { title: '第3章：人間関係・愛と絆の星の配置 ①', subtitle: '大切な人との共鳴と心の距離感' },
+                11: { title: '第3章：人間関係・愛と絆の星の配置 ②', subtitle: 'あなたらしい愛の育み方' },
+                12: { title: '第4章：未来への羅針盤と開運アクション', subtitle: '日常の中で星の輝きを活かすヒント' },
+                13: { title: '特別処方箋：スペシャルギフト', subtitle: 'あなたの星に寄り添う特別なメッセージ' },
+                14: { title: 'エピローグ：星々からの祝福のメッセージ', subtitle: '愛と光を込めて' },
+                15: { title: '特別付録：ケルト十字タロットリーディング ①', subtitle: '現状・深層心理・過去から近未来への流れ（1〜6枚目）' },
+                16: { title: '特別付録：ケルト十字タロットリーディング ②', subtitle: '周囲の環境・最終結果と総合お守りメッセージ（7〜10枚目）' }
+            };
+            return {
+                pageNumber,
+                title: defaultTitles[pageNumber]?.title || `第${pageNumber}ページ`,
+                subtitle: defaultTitles[pageNumber]?.subtitle || '',
+                body: '',
+                hasContent: false
+            };
+        });
+
+        function initPageSelector() {
+            const selector = document.getElementById('page-selector');
+            if (!selector) return;
+            const prevVal = selector.value || '0';
+            selector.innerHTML = '';
+            pagesData.forEach((p, idx) => {
+                const opt = document.createElement('option');
+                opt.value = String(idx);
+                const shortTitle = p.title.length > 18 ? p.title.slice(0, 18) + '…' : p.title;
+                opt.textContent = `P.${p.pageNumber}：${shortTitle}`;
+                selector.appendChild(opt);
+            });
+            selector.value = prevVal;
+        }
+
         // 初期化（前回の一時保存データがあれば自動復元）
         window.onload = function() {
             initPageSelector();
@@ -775,16 +832,26 @@
             const matches = [...raw.matchAll(headerRegex)];
 
             if (matches.length > 0) {
-                // P.X マーカーが見つかった場合：指定されたページ番号（1〜16）へ正確に流し込む
-                for (let i = 0; i < matches.length; i++) {
-                    const match = matches[i];
+                for (let m = 0; m < matches.length; m++) {
+                    const match = matches[m];
                     const pageNum = parseInt(match[1], 10);
                     const rawHeading = match[2].trim();
-                    const startIndex = match.index + match[0].length;
-                    const endIndex = (i + 1 < matches.length) ? matches[i + 1].index : raw.length;
-                    const sectionBody = raw.slice(startIndex, endIndex).trim();
+                    const contentStart = match.index + match[0].length;
+                    const contentEnd = (m + 1 < matches.length) ? matches[m + 1].index : raw.length;
+                    const sectionBody = raw.slice(contentStart, contentEnd).trim();
 
-                    if (pageNum >= 1 && pageNum <= pagesData.length) {
+                    if (pageNum >= 1 && pageNum <= 50) {
+                        // 現在のページ配列より大きいP番号が指定された場合は自動で枠を拡張
+                        while (pagesData.length < pageNum) {
+                            const newNum = pagesData.length + 1;
+                            pagesData.push({
+                                pageNumber: newNum,
+                                title: `第${newNum}ページ`,
+                                subtitle: '',
+                                body: '',
+                                hasContent: false
+                            });
+                        }
                         const idx = pageNum - 1;
                         // 見出しに「（サブタイトル）」が含まれていれば綺麗に分離
                         const subMatch = rawHeading.match(/^(.*?)[（(]([^）)]+)[）)]$/);
@@ -811,6 +878,7 @@
                 initPageSelector();
                 renderSinglePageEditor();
                 renderAllPages();
+                triggerAutoSave();
                 showToast(`${matches.length}ページ分の見出しと本文をズレなく反映しました！`);
             } else {
                 // P.X マーカーがない通常の長文の場合：段落単位で14ページに均等分割
@@ -992,7 +1060,7 @@
             const activePages = pagesData.filter((p, idx) => {
                 if (!hideEmpty) return true;
                 if (idx === 0) return true; // 表紙は常に表示
-                if (currentBrand === 'ihane' && idx === 12) return true; // イハネの歌詞ページは常に表示
+                if (currentBrand === 'ihane' && idx === 12 && pagesData.some((pg, i) => i >= 12 && pg.hasContent)) return true;
                 return p.hasContent || (p.body && p.body.trim().length > 0);
             });
 
