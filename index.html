@@ -197,9 +197,20 @@
         </div>
 
         <!-- アクションボタン群 -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- ファイル保存・読込ボタン（続きから再開用） -->
+            <button onclick="exportProjectFile()" title="現在の編集内容をファイルに保存して後で続きから再開できます" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 border border-emerald-600/60 flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span class="hidden sm:inline">保存</span>
+            </button>
+            <label for="project-file-input" title="保存したファイルを開いて続きから編集します" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 flex items-center gap-1.5 transition cursor-pointer">
+                <i class="fa-solid fa-folder-open text-sky-400"></i>
+                <span class="hidden sm:inline">読込</span>
+                <input type="file" id="project-file-input" accept=".json" onchange="importProjectFile(event)" class="hidden">
+            </label>
+
             <!-- 中身クリアボタン -->
-            <button onclick="openClearModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-rose-900/70 text-slate-200 hover:text-rose-200 border border-slate-600 hover:border-rose-500/50 flex items-center gap-1.5 transition">
+            <button onclick="openClearModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-rose-900/70 text-slate-200 hover:text-rose-200 border border-slate-600 hover:border-rose-500/50 flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-eraser"></i>
                 <span>クリア</span>
             </button>
@@ -538,69 +549,140 @@
         let currentBrand = 'neroli';
         let currentZoom = 0.80;
         let tarotImageBase64 = null;
+        let tarotImageMimeType = null;
+        const STORAGE_KEY = 'astrology_studio_autosave_v1';
         // 16ページ分のデフォルト章構成（P.1〜P.14：占星術 / P.15〜P.16：ケルト十字タロット2ページ）
-        const defaultChapters = [
-            { title: "表紙・プロローグ", subtitle: "ホロスコープ＆サビアンシンボル特別鑑定書" },
-            { title: "第1章：魂の本質と持って生まれた才能 ①", subtitle: "太陽と水星が示すあなたの光" },
-            { title: "第1章：魂の本質と持って生まれた才能 ②", subtitle: "月と金星が示す心の安心感と魅力" },
-            { title: "第1章：魂の本質と持って生まれた才能 ③", subtitle: "火星と木星が広げる情熱と幸運の扉" },
-            { title: "第1章：魂の本質と持って生まれた才能 ④", subtitle: "土星・外惑星が授ける深い智慧と使命" },
-            { title: "第1章：魂の本質と持って生まれた才能 ⑤", subtitle: "ドラゴンヘッド＆テイルが示す今世の物語" },
-            { title: "第1章：魂の本質と持って生まれた才能 ⑥", subtitle: "天体のアスペクトが織りなす才能のハーモニー" },
-            { title: "第2章：現在進行形の内面テーマ ①", subtitle: "プログレスの太陽と月が照らす「今の心の季節」" },
-            { title: "第2章：現在進行形の内面テーマ ②", subtitle: "心の成長と変化のステップ" },
-            { title: "第3章：未来への羅針盤とトランジット ①", subtitle: "これからの運気の流れと転機" },
-            { title: "第3章：未来への羅針盤とトランジット ②", subtitle: "大切なご縁と人間関係の広がり" },
-            { title: "第3章：未来への羅針盤とトランジット ③", subtitle: "自分らしく輝くためのヒント" },
-            { title: "特別処方箋：スペシャルギフト", subtitle: "日常に寄り添うお守りメッセージ" },
-            { title: "エピローグ：星々からの祝福のメッセージ", subtitle: "あなたの未来を照らす愛と光のエール" },
-            { title: "特別付録：ケルト十字タロット鑑定 ①", subtitle: "現状・深層心理・過去から近未来への流れ（1〜6枚目）" },
-            { title: "特別付録：ケルト十字タロット鑑定 ②", subtitle: "本音・周囲の環境・最終結果とお守りメッセージ（7〜10枚目）" }
-        ];
-
-        // ページごとの編集データ保持配列（16ページ分）
-        let pagesData = defaultChapters.map((ch, idx) => ({
-            pageNumber: idx + 1,
-            title: ch.title,
-            subtitle: ch.subtitle,
-            body: "",
-            hasContent: false
-        }));
-
-        // メタデータ
-        let metaData = {
-            title: "星とサビアンが紡ぐ 魂の羅針盤",
-            subtitle: "〜 あなたの個性・才能・愛の軌跡 〜",
-            client: "サンプル 様",
-            date: "2026年11月24日",
-            neroliAroma: "ネロリ × ベルガモット × サンダルウッド",
-            ihaneSongTitle: "星屑のプレリュード（Prelude of Stardust）",
-            ihaneSongStyle: "夜明けのハープと静かなピアノ、432Hzの癒やしの旋律",
-            ihaneLyrics: "夜空に散らばる　小さな光の粒\nまだ名前のない　あなたの物語\nそっと耳を澄ませば　聴こえてくるメロディ\n迷いさえも　美しい和音に変わるから\n\n巡る星たちの　導くままに\nあなただけの音色を　奏でてゆこう",
-            harukaTagline: "あなたの恋と心の波長、ハルカがいつでもそばで受け止めるね♡"
-        };
-
-        // 初期化
+        // 初期化（前回の一時保存データがあれば自動復元）
         window.onload = function() {
             initPageSelector();
             checkSavedApiKey();
-            loadSampleData(true);
-            switchBrand('neroli');
+            const restored = loadAutoSaveFromStorage();
+            if (!restored) {
+                loadSampleData(true);
+                switchBrand('neroli');
+            }
         };
 
-        // ページ選択プルダウンの初期化
-        function initPageSelector() {
-            const sel = document.getElementById('page-selector');
-            const prevVal = sel.value || 0;
-            sel.innerHTML = '';
-            pagesData.forEach((p, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.textContent = `P.${p.pageNumber}：${p.title}`;
-                sel.appendChild(opt);
-            });
-            sel.value = prevVal;
+        // =====================================================================
+        // 自動一時保存（ブラウザ記憶）＆ ファイル保存・読込（PC保存）
+        // =====================================================================
+        function triggerAutoSave() {
+            try {
+                const statePayload = {
+                    version: 1,
+                    savedAt: new Date().toISOString(),
+                    currentBrand,
+                    metaData,
+                    pagesData,
+                    bulkInput: document.getElementById('bulk-input')?.value || '',
+                    tarotContext: document.getElementById('tarot-context-input')?.value || '',
+                    tarotResult: document.getElementById('tarot-result-output')?.value || '',
+                    hideEmpty: document.getElementById('hide-empty-pages')?.checked ?? true
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(statePayload));
+            } catch (e) {
+                // 容量超過などの場合は静かにスキップ
+            }
+        }
+
+        function applyRestoredState(state) {
+            if (!state) return false;
+            if (state.metaData) {
+                metaData = { ...metaData, ...state.metaData };
+                document.getElementById('meta-title').value = metaData.title || '';
+                document.getElementById('meta-subtitle').value = metaData.subtitle || '';
+                document.getElementById('meta-client').value = metaData.client || '';
+                document.getElementById('meta-date').value = metaData.date || '';
+                document.getElementById('meta-neroli-aroma').value = metaData.neroliAroma || '';
+                document.getElementById('meta-ihane-song-title').value = metaData.ihaneSongTitle || '';
+                document.getElementById('meta-ihane-song-style').value = metaData.ihaneSongStyle || '';
+                document.getElementById('meta-ihane-lyrics').value = metaData.ihaneLyrics || '';
+                document.getElementById('meta-haruka-tagline').value = metaData.harukaTagline || '';
+            }
+            if (Array.isArray(state.pagesData) && state.pagesData.length > 0) {
+                pagesData = state.pagesData;
+            }
+            if (typeof state.bulkInput === 'string') {
+                document.getElementById('bulk-input').value = state.bulkInput;
+                updateBulkCharCount();
+            }
+            if (typeof state.tarotContext === 'string') {
+                document.getElementById('tarot-context-input').value = state.tarotContext;
+            }
+            if (typeof state.tarotResult === 'string') {
+                document.getElementById('tarot-result-output').value = state.tarotResult;
+                document.getElementById('tarot-result-chars').textContent = `${state.tarotResult.length} 文字`;
+            }
+            if (typeof state.hideEmpty === 'boolean') {
+                document.getElementById('hide-empty-pages').checked = state.hideEmpty;
+            }
+            switchBrand(state.currentBrand || 'neroli');
+            initPageSelector();
             renderSinglePageEditor();
+            renderAllPages();
+            return true;
+        }
+
+        function loadAutoSaveFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                const ok = applyRestoredState(parsed);
+                if (ok) {
+                    showToast('前回編集していた続きのデータを自動復元しました');
+                }
+                return ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function exportProjectFile() {
+            const statePayload = {
+                version: 1,
+                savedAt: new Date().toISOString(),
+                currentBrand,
+                metaData,
+                pagesData,
+                bulkInput: document.getElementById('bulk-input')?.value || '',
+                tarotContext: document.getElementById('tarot-context-input')?.value || '',
+                tarotResult: document.getElementById('tarot-result-output')?.value || '',
+                hideEmpty: document.getElementById('hide-empty-pages')?.checked ?? true
+            };
+            const blob = new Blob([JSON.stringify(statePayload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const safeClient = (metaData.client || '鑑定書').replace(/[\\/:*?"<>|\s]/g, '_');
+            const dateStr = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `${safeClient}_${currentBrand}_${dateStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('鑑定書データをファイルに保存しました！（「読込」からいつでも再開できます）');
+        }
+
+        function importProjectFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (applyRestoredState(parsed)) {
+                        triggerAutoSave();
+                        showToast('保存ファイルから続きのデータを読み込みました！');
+                    } else {
+                        showToast('ファイルの形式が正しくありません');
+                    }
+                } catch (err) {
+                    showToast('ファイルの読み込みに失敗しました');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
         }
 
         // ブランド切り替え
@@ -646,6 +728,7 @@
 
             initPageSelector();
             renderAllPages();
+            triggerAutoSave();
         }
 
         // 左パネル内のサブタブ切り替え
@@ -668,6 +751,7 @@
         function updateBulkCharCount() {
             const text = document.getElementById('bulk-input').value;
             document.getElementById('total-char-count').textContent = `${text.length.toLocaleString()} 文字`;
+            triggerAutoSave();
         }
 
         // =====================================================================
@@ -761,6 +845,7 @@
                 initPageSelector();
                 renderSinglePageEditor();
                 renderAllPages();
+                triggerAutoSave();
                 showToast('鑑定文をページごとに分割して反映しました');
             }
         }
@@ -794,6 +879,7 @@
             pagesData[idx].hasContent = pagesData[idx].body.trim().length > 0;
             document.getElementById('single-page-chars').textContent = `${pagesData[idx].body.length} 文字`;
             renderAllPages();
+            triggerAutoSave();
         }
 
         // メタデータ入力フォームから状態更新
@@ -808,6 +894,7 @@
             metaData.ihaneLyrics = document.getElementById('meta-ihane-lyrics').value;
             metaData.harukaTagline = document.getElementById('meta-haruka-tagline').value;
             renderAllPages();
+            triggerAutoSave();
         }
 
         // ズーム変更
@@ -847,6 +934,7 @@
 
             renderSinglePageEditor();
             renderAllPages();
+            localStorage.removeItem(STORAGE_KEY);
             closeClearModal();
             showToast('中身をすべてクリアしました');
         }
@@ -1173,6 +1261,42 @@
 【占いの内容・相談テーマ】${contextText || '現在の状況と今後の展開（ケルト十字スプレッド）'}
 
 上記の情報${tarotImageBase64 ? 'と添付されたタロットカードの写真' : ''}をもとに、ブランドの世界観たっぷりのケルト十字タロット鑑定結果（P.15・P.16の2ページ分）を作成してください。`;
+
+            const parts = [{ text: userPrompt }];
+            if (tarotImageBase64 && tarotImageMimeType) {
+                parts.push({
+                    inlineData: {
+                        mimeType: tarotImageMimeType,
+                        data: tarotImageBase64
+                    }
+                });
+            }
+
+            showLoading('タロット画像とテーマを読み込んで鑑定中...');
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemInstruction }] },
+                        contents: [{ parts: parts }]
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error?.message || 'APIエラーが発生しました');
+
+                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                document.getElementById('tarot-result-output').value = resultText.trim();
+                document.getElementById('tarot-result-chars').textContent = `${resultText.trim().length} 文字`;
+                triggerAutoSave();
+                showToast('タロット鑑定結果の生成が完了しました！');
+            } catch (err) {
+                showToast(`エラー: ${err.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
         function applyTarotToPages15And16() {
             const text = document.getElementById('tarot-result-output').value.trim();
             if (!text) {
@@ -1244,31 +1368,8 @@
 
             initPageSelector();
             renderAllPages();
+            triggerAutoSave();
             showToast('P.15・P.16の2ページにケルト十字タロット鑑定を反映しました！');
-        }
-
-            showLoading('タロット画像とテーマを読み込んで鑑定中...');
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemInstruction }] },
-                        contents: [{ parts: parts }]
-                    })
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error?.message || 'APIエラーが発生しました');
-
-                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                document.getElementById('tarot-result-output').value = resultText.trim();
-                document.getElementById('tarot-result-chars').textContent = `${resultText.trim().length} 文字`;
-                showToast('タロット鑑定結果の生成が完了しました！');
-            } catch (err) {
-                showToast(`エラー: ${err.message}`);
-            } finally {
-                hideLoading();
-            }
         }
 
         function copyTarotResultOnly() {
