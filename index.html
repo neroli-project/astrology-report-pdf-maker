@@ -175,8 +175,8 @@
                 <i class="fa-solid fa-wand-sparkles"></i>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">API キー（AIza... または AQ...）</label>
-                <input type="password" id="gemini-api-key-input" placeholder="AIzaSy... / AQ..." class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <h1 class="text-sm sm:text-base font-bold tracking-wide leading-tight">占い鑑定書＆タロットAIスタジオ</h1>
+                <p class="text-[10px] text-slate-400">ネロリの小部屋 / イハネ / AI専属占い師ハルカ（PDF＆Canva両対応）</p>
             </div>
         </div>
 
@@ -489,11 +489,16 @@
                 </button>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-                Google AI Studio で取得した Gemini API キーを入力してください。キーはお使いのブラウザ内（localStorage）にのみ保存され、タロット画像AI鑑定や歌詞生成に使用されます。
+                Google AI Studio 等で取得した Gemini API キーを入力してください。キーはお使いのブラウザ内（localStorage）にのみ保存され、タロット画像AI鑑定や歌詞生成に使用されます。
             </p>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">API キー（AIza...）</label>
-                <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <label class="block text-xs font-bold text-slate-700 mb-1">API キー（AIza... または AQ...）</label>
+                <div class="relative">
+                    <input type="password" id="gemini-api-key-input" placeholder="AIzaSy... / AQ..." class="w-full p-2.5 pr-10 text-xs font-mono text-slate-900 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <button type="button" onclick="toggleApiKeyVisibility()" title="キーを表示/非表示" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                        <i id="api-key-eye-icon" class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="flex justify-between items-center pt-2">
                 <button onclick="clearApiKey()" class="text-xs text-rose-600 hover:underline font-semibold">キーを削除</button>
@@ -1476,7 +1481,22 @@
             document.getElementById('api-modal').classList.remove('hidden');
             document.getElementById('api-modal').classList.add('flex');
             const saved = localStorage.getItem('gemini_api_key') || '';
-            document.getElementById('gemini-api-key-input').value = saved;
+            const input = document.getElementById('gemini-api-key-input');
+            input.type = 'password';
+            document.getElementById('api-key-eye-icon').className = 'fa-regular fa-eye';
+            input.value = saved;
+        }
+
+        function toggleApiKeyVisibility() {
+            const input = document.getElementById('gemini-api-key-input');
+            const icon = document.getElementById('api-key-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
         }
 
         function closeApiModal() {
@@ -1528,42 +1548,6 @@
             if (!apiKey || apiKey.length > 200 || /\s/.test(apiKey) || apiKey.includes('【P.')) {
                 openApiModal();
                 showToast('先にGemini APIキーを設定してください');
-                return;
-            }
-            localStorage.setItem('gemini_api_key', key);
-            checkSavedApiKey();
-            closeApiModal();
-            showToast('Gemini APIキーを保存しました');
-        }
-
-        function clearApiKey() {
-            localStorage.removeItem('gemini_api_key');
-            document.getElementById('gemini-api-key-input').value = '';
-            checkSavedApiKey();
-            showToast('APIキーを削除しました');
-        }
-
-        function checkSavedApiKey() {
-            const key = (localStorage.getItem('gemini_api_key') || '').trim();
-            const statusText = document.getElementById('api-status-text');
-            const statusBtn = document.getElementById('api-status-btn');
-            if (key && key.startsWith('AIza') && key.length <= 100) {
-                statusText.textContent = 'API連携済';
-                statusBtn.classList.add('border-emerald-500/60', 'text-emerald-300');
-            } else {
-                if (key) {
-                    localStorage.removeItem('gemini_api_key');
-                }
-                statusText.textContent = 'Gemini API設定';
-                statusBtn.classList.remove('border-emerald-500/60', 'text-emerald-300');
-            }
-        }
-
-        async function generateLyricsWithGemini() {
-            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-            if (!apiKey || !apiKey.startsWith('AIza') || apiKey.length > 100) {
-                openApiModal();
-                showToast('先に正しいGemini APIキー（AIza...）を設定してください');
                 return;
             }
 
