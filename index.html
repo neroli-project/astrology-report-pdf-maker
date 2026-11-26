@@ -128,6 +128,54 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* =====================================================================
+           印刷・PDF保存専用スタイル（UIをすべて隠し、全ページをA4・1枚ずつ出力）
+           ===================================================================== */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            header, aside, .no-print, #zoom-bar, #api-modal, #clear-modal, #loading-overlay, #toast {
+                display: none !important;
+            }
+            #workspace-wrapper, #preview-scroll-area {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+            #pages-container {
+                transform: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 210mm !important;
+            }
+            .pdf-page {
+                width: 210mm !important;
+                height: 297mm !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                break-after: page;
+            }
+            .pdf-page:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800">
