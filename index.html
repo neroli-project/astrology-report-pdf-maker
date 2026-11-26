@@ -65,10 +65,10 @@
             word-break: break-all;
         }
 
-        /* タロット最終ページ（P.17：6〜10枚目＋総合まとめ段落まで余裕で収まる専用サイズ） */
+        /* タロット最終ページ（P.17：6〜10枚目＋総合まとめ段落＋フッターまで余裕で収まる専用サイズ） */
         .tarot-body-final {
-            font-size: 8.8pt;
-            line-height: 1.54;
+            font-size: 8.3pt;
+            line-height: 1.44;
             letter-spacing: 0.02em;
             text-align: justify;
             white-space: pre-wrap;
@@ -1245,12 +1245,12 @@
                     const isTarotFinalPage = originalIndex === 16;
                     const isTarotDetailPage = originalIndex === 15;
                     const bodyClass = isTarotFinalPage ? 'tarot-body-final' : isTarotDetailPage ? 'tarot-body' : 'reading-body';
+                    const framePadding = isTarotFinalPage ? 'px-8 py-6' : 'p-8';
                     pageEl.innerHTML = `
                         ${copyBtnHtml}
-                        <div class="page-frame w-full flex-1 p-8 flex flex-col justify-between">
+                        <div class="page-frame w-full flex-1 ${framePadding} flex flex-col justify-between">
                             <!-- ページヘッダー -->
-                            <div class="border-b divider-line pb-3 mb-3 pr-24">
-                                <div class="flex justify-between items-center mb-1">
+                            <div class="border-b divider-line pb-2.5 mb-2.5 pr-24">
                                     <span class="text-[10px] font-cinzel tracking-[0.2em] accent-text uppercase">PAGE ${String(page.pageNumber).padStart(2, '0')}</span>
                                     <span class="text-[10px] opacity-60">${brandNameLabel}</span>
                                 </div>
