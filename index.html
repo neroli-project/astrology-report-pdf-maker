@@ -55,6 +55,16 @@
             word-break: break-all;
         }
 
+        /* タロット解説ページ（P.16・P.17：5枚分の見出し＆改行がすべて見切れず収まる専用サイズ） */
+        .tarot-body {
+            font-size: 9.5pt;
+            line-height: 1.66;
+            letter-spacing: 0.03em;
+            text-align: justify;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
         /* =====================================================================
            印刷・PDF出力専用ルール（書式ズレ・ページ跨ぎを完全に防止）
            ===================================================================== */
@@ -1275,11 +1285,13 @@
                 }
                 // 通常の鑑定本文ページ（1ページ1章完結・A4下端まで美しく収まる設計）
                 else {
+                    const isTarotDetailPage = originalIndex >= 15;
+                    const bodyClass = isTarotDetailPage ? 'tarot-body' : 'reading-body';
                     pageEl.innerHTML = `
                         ${copyBtnHtml}
                         <div class="page-frame w-full flex-1 p-8 flex flex-col justify-between">
                             <!-- ページヘッダー -->
-                            <div class="border-b divider-line pb-3 mb-3.5 pr-24">
+                            <div class="border-b divider-line pb-3 mb-3 pr-24">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-[10px] font-cinzel tracking-[0.2em] accent-text uppercase">PAGE ${String(page.pageNumber).padStart(2, '0')}</span>
                                     <span class="text-[10px] opacity-60">${brandNameLabel}</span>
@@ -1290,11 +1302,11 @@
 
                             <!-- 本文エリア -->
                             <div class="flex-1 overflow-hidden">
-                                <div class="reading-body">${escapeHtml(cleanMarkdownSymbols(page.body || '（ここに鑑定文が入ります。左側の「鑑定文を貼り付け」からテキストを反映できます）'))}</div>
+                                <div class="${bodyClass}">${escapeHtml(cleanMarkdownSymbols(page.body || '（ここに鑑定文が入ります。左側の「鑑定文を貼り付け」からテキストを反映できます）'))}</div>
                             </div>
 
                             <!-- ページフッター -->
-                            <div class="pt-2.5 mt-3 border-t divider-line flex justify-between items-center text-[10px] opacity-65">
+                            <div class="pt-2.5 mt-2.5 border-t divider-line flex justify-between items-center text-[10px] opacity-65">
                                 <span>${brandNameLabel}</span>
                                 <span>- ${displayPageNum} / ${totalVisiblePages} -</span>
                                 <span>${escapeHtml(metaData.client)}</span>
@@ -1395,8 +1407,8 @@
 【構成ルール（ケルト十字スプレッド・扉1ページ＋解説2ページの計3ページ構成）】
 ・PDF（A4縦）で1行も見切れず美しく収めるため、必ず以下の3つの見出し（P.15・P.16・P.17）を使って出力してください。
 ・P.15（タロット導入メッセージ）：展開写真のすぐ下に載せる導入文です。約220〜280文字で「本日は、ケルト十字スプレッドで〇〇様の『テーマ』を深く読み解いてまいります〜」という温かな導入メッセージを書いてください。
-・P.16（ケルト十字解説 ①：1〜5枚目）：1枚目（現状）、2枚目（障害/鍵）、3枚目（顕在意識）、4枚目（潜在意識）、5枚目（過去）の5枚だけを解説します。A4下端で見切れないよう、全体で必ず700〜780文字以内に収めてください。
-・P.17（ケルト十字解説 ②：6〜10枚目）：6枚目（近未来）、7枚目（本人の立場）、8枚目（周囲の環境）、9枚目（願望と恐れ）、10枚目（最終結果と総合お守りメッセージ）の5枚だけを解説します。A4下端で見切れないよう、全体で必ず700〜780文字以内に収めてください。
+・P.16（ケルト十字解説 ①：1〜5枚目）：1枚目（現状）、2枚目（障害/鍵）、3枚目（顕在意識）、4枚目（潜在意識）、5枚目（過去）の5枚だけを解説します。見出しと空行を含めてA4下端で見切れないよう、1枚あたり約110〜125文字・全体で必ず600〜670文字以内に凝縮してまとめてください。
+・P.17（ケルト十字解説 ②：6〜10枚目）：6枚目（近未来）、7枚目（本人の立場）、8枚目（周囲の環境）、9枚目（願望と恐れ）、10枚目（最終結果と総合お守りメッセージ）の5枚だけを解説します。見出しと空行を含めてA4下端で見切れないよう、1枚あたり約110〜125文字・全体で必ず600〜670文字以内に凝縮してまとめてください。
 ・【重要】アスタリスク（** や *）などのMarkdown記号は一切使わず、「【1. 現状：〇〇（正位置）】」のように綺麗な日本語の括弧で書いてください。
 
 【出力フォーマット（必ずこの3つの見出しを含めること）】
