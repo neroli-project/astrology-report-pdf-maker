@@ -667,6 +667,17 @@
             }
             if (Array.isArray(state.pagesData) && state.pagesData.length > 0) {
                 pagesData = state.pagesData;
+                while (pagesData.length < 17) {
+                    const newNum = pagesData.length + 1;
+                    pagesData.push({
+                        pageNumber: newNum,
+                        title: newNum === 15 ? '特別鑑定：ケルト十字タロットリーディング' : newNum === 16 ? 'ケルト十字リーディング解説 ①（1〜5枚目）' : 'ケルト十字リーディング解説 ②（6〜10枚目）',
+                        subtitle: '',
+                        body: '',
+                        hasContent: false,
+                        isTarotIntro: newNum === 15
+                    });
+                }
             }
             if (typeof state.bulkInput === 'string') {
                 document.getElementById('bulk-input').value = state.bulkInput;
@@ -1091,6 +1102,7 @@
                 const displayPageNum = visibleIndex + 1;
 
                 const pageEl = document.createElement('div');
+                pageEl.id = `preview-page-${page.pageNumber}`;
                 pageEl.className = `pdf-page ${brandClass} font-mincho p-[13mm]`;
 
                 // 各ページ右上に配置するCanva用ワンクリックコピーボタン（印刷時はno-printで非表示）
@@ -1437,6 +1449,19 @@
                 return;
             }
 
+            // 必ず17ページ分（P.1〜P.17）の枠を確保する
+            while (pagesData.length < 17) {
+                const newNum = pagesData.length + 1;
+                pagesData.push({
+                    pageNumber: newNum,
+                    title: `第${newNum}ページ`,
+                    subtitle: '',
+                    body: '',
+                    hasContent: false,
+                    isTarotIntro: newNum === 15
+                });
+            }
+
             const defaultTitles = currentBrand === 'haruka'
                 ? [
                     { title: '特別鑑定：ハルカのケルト十字タロットリーディング', sub: 'カードが映し出す今のあなたへのメッセージ' },
@@ -1455,32 +1480,31 @@
                         { title: 'ケルト十字リーディング解説 ②（6〜10枚目）', sub: '近未来・あなたの立場・周囲の環境・最終結果' }
                     ];
 
-            const p15Match = text.match(/^(?:=+\s*)?【\s*P\.?\s*15\s*】\s*(.*?)(?:\s*=+)?$/m);
-            const p16Match = text.match(/^(?:=+\s*)?【\s*P\.?\s*16\s*】\s*(.*?)(?:\s*=+)?$/m);
-            const p17Match = text.match(/^(?:=+\s*)?【\s*P\.?\s*17\s*】\s*(.*?)(?:\s*=+)?$/m);
+            const p15Match = text.match(/^.*【?\s*P\.?\s*15\s*】?\s*(.*?)(?:\s*=+)?$/m);
+            const p16Match = text.match(/^.*【?\s*P\.?\s*16\s*】?\s*(.*?)(?:\s*=+)?$/m);
+            const p17Match = text.match(/^.*【?\s*P\.?\s*17\s*】?\s*(.*?)(?:\s*=+)?$/m);
 
             if (p15Match && p16Match && p17Match) {
                 const p15Body = text.slice(p15Match.index + p15Match[0].length, p16Match.index).trim();
                 const p16Body = text.slice(p16Match.index + p16Match[0].length, p17Match.index).trim();
                 const p17Body = text.slice(p17Match.index + p17Match[0].length).trim();
 
-                pagesData[14].title = p15Match[1].trim() || defaultTitles[0].title;
+                pagesData[14].title = p15Match[1].replace(/^=+\s*|\s*=+$/g, '').trim() || defaultTitles[0].title;
                 pagesData[14].subtitle = defaultTitles[0].sub;
                 pagesData[14].body = p15Body;
                 pagesData[14].hasContent = true;
                 pagesData[14].isTarotIntro = true;
 
-                pagesData[15].title = p16Match[1].trim() || defaultTitles[1].title;
+                pagesData[15].title = p16Match[1].replace(/^=+\s*|\s*=+$/g, '').trim() || defaultTitles[1].title;
                 pagesData[15].subtitle = defaultTitles[1].sub;
                 pagesData[15].body = p16Body;
                 pagesData[15].hasContent = true;
 
-                pagesData[16].title = p17Match[1].trim() || defaultTitles[2].title;
+                pagesData[16].title = p17Match[1].replace(/^=+\s*|\s*=+$/g, '').trim() || defaultTitles[2].title;
                 pagesData[16].subtitle = defaultTitles[2].sub;
                 pagesData[16].body = p17Body;
                 pagesData[16].hasContent = true;
             } else if (p15Match && p16Match) {
-                // 旧2パート形式（P.15・P.16のみ）の場合は、デフォルト導入文をP.15に入れ、解説をP.16・P.17へ配置
                 const p15Body = text.slice(p15Match.index + p15Match[0].length, p16Match.index).trim();
                 const p16Body = text.slice(p16Match.index + p16Match[0].length).trim();
 
@@ -1490,17 +1514,16 @@
                 pagesData[14].hasContent = true;
                 pagesData[14].isTarotIntro = true;
 
-                pagesData[15].title = p15Match[1].trim() || defaultTitles[1].title;
+                pagesData[15].title = p15Match[1].replace(/^=+\s*|\s*=+$/g, '').trim() || defaultTitles[1].title;
                 pagesData[15].subtitle = defaultTitles[1].sub;
                 pagesData[15].body = p15Body;
                 pagesData[15].hasContent = true;
 
-                pagesData[16].title = p16Match[1].trim() || defaultTitles[2].title;
+                pagesData[16].title = p16Match[1].replace(/^=+\s*|\s*=+$/g, '').trim() || defaultTitles[2].title;
                 pagesData[16].subtitle = defaultTitles[2].sub;
                 pagesData[16].body = p16Body;
                 pagesData[16].hasContent = true;
             } else {
-                // マーカーなしの場合は段落単位でP.16・P.17に均等分割し、P.15は導入扉ページにする
                 const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0);
                 const halfLen = Math.ceil(text.length / 2);
                 let part1 = [];
@@ -1536,6 +1559,13 @@
             renderAllPages();
             triggerAutoSave();
             showToast('P.15（展開写真＆導入扉）とP.16・P.17（解説）に反映しました！');
+
+            setTimeout(() => {
+                const targetPageEl = document.getElementById('preview-page-15');
+                if (targetPageEl) {
+                    targetPageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 150);
         }
 
         async function callGeminiWithRetry(apiKey, payload, loadingText = 'Gemini AIがリーディング中...') {
