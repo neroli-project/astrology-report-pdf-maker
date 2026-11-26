@@ -65,57 +65,14 @@
             word-break: break-all;
         }
 
-        /* =====================================================================
-           印刷・PDF出力専用ルール（書式ズレ・ページ跨ぎを完全に防止）
-           ===================================================================== */
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
-            html, body {
-                width: 210mm;
-                height: auto !important;
-                overflow: visible !important;
-                background: #ffffff !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            header, aside, #zoom-bar, .no-print, #api-modal, #clear-modal, #loading-overlay, #toast {
-                display: none !important;
-            }
-            #workspace-wrapper {
-                display: block !important;
-                overflow: visible !important;
-                height: auto !important;
-            }
-            #preview-scroll-area {
-                display: block !important;
-                overflow: visible !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                background: transparent !important;
-            }
-            #pages-container {
-                transform: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 210mm !important;
-            }
-            .pdf-page {
-                width: 210mm !important;
-                height: 297mm !important;
-                margin: 0 !important;
-                box-shadow: none !important;
-                page-break-after: always !important;
-                break-after: page !important;
-            }
-            .pdf-page:last-child {
-                page-break-after: auto !important;
-                break-after: auto !important;
-            }
+        /* タロット最終ページ（P.17：6〜10枚目＋総合まとめ段落まで余裕で収まる専用サイズ） */
+        .tarot-body-final {
+            font-size: 8.8pt;
+            line-height: 1.54;
+            letter-spacing: 0.02em;
+            text-align: justify;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         /* =====================================================================
@@ -1285,8 +1242,9 @@
                 }
                 // 通常の鑑定本文ページ（1ページ1章完結・A4下端まで美しく収まる設計）
                 else {
-                    const isTarotDetailPage = originalIndex >= 15;
-                    const bodyClass = isTarotDetailPage ? 'tarot-body' : 'reading-body';
+                    const isTarotFinalPage = originalIndex === 16;
+                    const isTarotDetailPage = originalIndex === 15;
+                    const bodyClass = isTarotFinalPage ? 'tarot-body-final' : isTarotDetailPage ? 'tarot-body' : 'reading-body';
                     pageEl.innerHTML = `
                         ${copyBtnHtml}
                         <div class="page-frame w-full flex-1 p-8 flex flex-col justify-between">
@@ -1408,7 +1366,7 @@
 ・PDF（A4縦）で1行も見切れず美しく収めるため、必ず以下の3つの見出し（P.15・P.16・P.17）を使って出力してください。
 ・P.15（タロット導入メッセージ）：展開写真のすぐ下に載せる導入文です。約220〜280文字で「本日は、ケルト十字スプレッドで〇〇様の『テーマ』を深く読み解いてまいります〜」という温かな導入メッセージを書いてください。
 ・P.16（ケルト十字解説 ①：1〜5枚目）：1枚目（現状）、2枚目（障害/鍵）、3枚目（顕在意識）、4枚目（潜在意識）、5枚目（過去）の5枚だけを解説します。見出しと空行を含めてA4下端で見切れないよう、1枚あたり約110〜125文字・全体で必ず600〜670文字以内に凝縮してまとめてください。
-・P.17（ケルト十字解説 ②：6〜10枚目）：6枚目（近未来）、7枚目（本人の立場）、8枚目（周囲の環境）、9枚目（願望と恐れ）、10枚目（最終結果と総合お守りメッセージ）の5枚だけを解説します。見出しと空行を含めてA4下端で見切れないよう、1枚あたり約110〜125文字・全体で必ず600〜670文字以内に凝縮してまとめてください。
+・P.17（ケルト十字解説 ②：6〜10枚目）：6枚目（近未来）、7枚目（本人の立場）、8枚目（周囲の環境）、9枚目（願望と恐れ）、10枚目（最終結果）の5枚と、最後に短い総合お守りメッセージ（2〜3行）を添えます。見出しと空行を含めてA4下端で見切れないよう、全体で必ず560〜630文字以内に凝縮してまとめてください。
 ・【重要】アスタリスク（** や *）などのMarkdown記号は一切使わず、「【1. 現状：〇〇（正位置）】」のように綺麗な日本語の括弧で書いてください。
 
 【出力フォーマット（必ずこの3つの見出しを含めること）】
